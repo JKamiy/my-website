@@ -111,6 +111,8 @@
     </div>
 
     <script>
+        var scheme = 'bankabc://';
+        
         function showStatus(msg, type) {
             var el = document.getElementById('status');
             el.innerHTML = msg;
@@ -121,17 +123,7 @@
             }, 3000);
         }
         
-        function getScheme() {
-            var ua = navigator.userAgent;
-            if (ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1) {
-                return 'bankabc://';
-            } else {
-                return 'abc://com.android.bankabc';
-            }
-        }
-        
         function openApp() {
-            var scheme = getScheme();
             showStatus('正在打开农业银行App...', 'info');
             
             var a = document.createElement('a');
@@ -147,7 +139,6 @@
         }
         
         function openWithIframe() {
-            var scheme = getScheme();
             showStatus('使用iframe方式...', 'info');
             
             var iframe = document.createElement('iframe');
@@ -162,7 +153,6 @@
         }
         
         function openWithLocation() {
-            var scheme = getScheme();
             showStatus('使用直接跳转...', 'info');
             window.location.href = scheme;
         }
