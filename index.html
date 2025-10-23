@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>打开微信链接</title>
   <title>打开微信或支付宝</title>
   <style>
     :root {
@@ -11,15 +10,11 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background-color: #f4f6f8;
       min-height: 100vh;
       background: linear-gradient(160deg, #f6f9fc 0%, #eef2f7 100%);
     }
@@ -37,8 +32,6 @@
     }
 
     h1 {
-      color: #333;
-      margin-bottom: 30px;
       margin: 0;
       color: #1f2933;
       font-size: clamp(1.35rem, 5vw, 1.75rem);
@@ -46,37 +39,24 @@
 
     .button-group {
       display: flex;
-      gap: 16px;
       flex-direction: column;
       gap: 14px;
     }
 
     button {
-      background-color: #1aad19;
-      color: white;
       appearance: none;
       border: none;
-      padding: 14px 28px;
-      border-radius: 8px;
-      font-size: 18px;
       border-radius: 12px;
       padding: 16px 20px;
       font-size: 1.05rem;
       font-weight: 600;
       color: #fff;
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.2s ease;
-    }
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
       transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
       box-shadow: 0 12px 22px -16px rgba(0, 0, 0, 0.45);
     }
 
     button:focus-visible {
-      outline: 3px solid rgba(255, 255, 255, 0.8);
-      outline-offset: 2px;
       outline: 3px solid rgba(255, 255, 255, 0.65);
       outline-offset: 3px;
     }
@@ -86,28 +66,20 @@
     }
 
     #openWeixin {
-      background-color: #1aad19;
       background: linear-gradient(135deg, #1aad19, #0f8e13);
     }
 
     #openWeixin:hover {
-      background-color: #179b16;
       filter: brightness(1.05);
     }
 
     #openAlipay {
-      background-color: #1677ff;
       background: linear-gradient(135deg, #1677ff, #0f5ed1);
     }
 
     #openAlipay:hover {
-      background-color: #0f5ed1;
       filter: brightness(1.05);
     }
-    p {
-      margin-top: 20px;
-      color: #666;
-      font-size: 14px;
 
     .hint {
       margin: 0;
@@ -116,10 +88,6 @@
     }
 
     #statusMessage {
-      margin-top: 24px;
-      color: #444;
-      font-size: 15px;
-      text-align: center;
       margin: 0;
       font-size: 0.95rem;
       color: #374151;
@@ -152,16 +120,6 @@
   </style>
 </head>
 <body>
-  <h1>打开微信客户端</h1>
-  <button id="openWeixin">立即打开微信</button>
-  <p>若无反应，请确认您已安装微信客户端。</p>
-  <h1>打开微信或支付宝客户端</h1>
-  <div class="button-group">
-    <button id="openWeixin" type="button">打开微信</button>
-    <button id="openAlipay" type="button">打开支付宝</button>
-  </div>
-  <p>若无反应，请确认您已安装对应的客户端。</p>
-  <p id="statusMessage" hidden aria-live="polite"></p>
   <main class="app-launcher">
     <h1>选择要打开的应用</h1>
     <div class="button-group">
@@ -173,11 +131,6 @@
   </main>
 
   <script>
-    document.getElementById('openWeixin').addEventListener('click', function() {
-      window.location.href = "weixin://";
-      // 备用方案（可选）：短延时后提示
-      setTimeout(function() {
-        alert("如果没有自动打开微信，请手动启动。");
     const statusMessage = document.getElementById('statusMessage');
     const weixinButton = document.getElementById('openWeixin');
     const alipayButton = document.getElementById('openAlipay');
@@ -200,7 +153,6 @@
       setStatusMessage(`正在尝试打开${actionLabel}…`);
 
       let successClearTimer = null;
-      const fallbackTimer = setTimeout(function() {
       const fallbackTimer = setTimeout(function () {
         setStatusMessage(fallbackText);
         cleanup();
@@ -219,7 +171,6 @@
         if (document.hidden) {
           cleanup();
           setStatusMessage(`${actionLabel} 似乎已经打开。祝您使用愉快！`);
-          successClearTimer = setTimeout(function() {
           successClearTimer = setTimeout(function () {
             setStatusMessage('');
           }, 2500);
@@ -230,12 +181,10 @@
       window.location.href = scheme;
     }
 
-    document.getElementById('openWeixin').addEventListener('click', function() {
     weixinButton.addEventListener('click', function () {
       tryOpenApp({ scheme: 'weixin://', name: '微信' });
     });
 
-    document.getElementById('openAlipay').addEventListener('click', function() {
     alipayButton.addEventListener('click', function () {
       tryOpenApp({ scheme: 'alipay://', name: '支付宝' });
     });
