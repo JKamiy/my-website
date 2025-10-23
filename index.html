@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>打开微信链接</title>
+  <title>打开微信或支付宝</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -18,6 +19,10 @@
       color: #333;
       margin-bottom: 30px;
     }
+    .button-group {
+      display: flex;
+      gap: 16px;
+    }
     button {
       background-color: #1aad19;
       color: white;
@@ -26,14 +31,42 @@
       border-radius: 8px;
       font-size: 18px;
       cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
     }
     button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    button:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.8);
+      outline-offset: 2px;
+    }
+    #openWeixin {
+      background-color: #1aad19;
+    }
+    #openWeixin:hover {
       background-color: #179b16;
+    }
+    #openAlipay {
+      background-color: #1677ff;
+    }
+    #openAlipay:hover {
+      background-color: #0f5ed1;
     }
     p {
       margin-top: 20px;
       color: #666;
       font-size: 14px;
+    }
+    #statusMessage {
+      margin-top: 24px;
+      color: #444;
+      font-size: 15px;
+      text-align: center;
+      min-height: 1.2em;
+    }
+    #statusMessage[hidden] {
+      display: none;
     }
   </style>
 </head>
@@ -41,6 +74,13 @@
   <h1>打开微信客户端</h1>
   <button id="openWeixin">立即打开微信</button>
   <p>若无反应，请确认您已安装微信客户端。</p>
+  <h1>打开微信或支付宝客户端</h1>
+  <div class="button-group">
+    <button id="openWeixin" type="button">打开微信</button>
+    <button id="openAlipay" type="button">打开支付宝</button>
+  </div>
+  <p>若无反应，请确认您已安装对应的客户端。</p>
+  <p id="statusMessage" hidden aria-live="polite"></p>
 
   <script>
     document.getElementById('openWeixin').addEventListener('click', function() {
@@ -48,7 +88,60 @@
       // 备用方案（可选）：短延时后提示
       setTimeout(function() {
         alert("如果没有自动打开微信，请手动启动。");
+    const statusMessage = document.getElementById('statusMessage');
+
+    function setStatusMessage(text) {
+      if (text) {
+        statusMessage.textContent = text;
+        statusMessage.hidden = false;
+      } else {
+        statusMessage.textContent = '';
+        statusMessage.hidden = true;
+      }
+    }
+
+    function tryOpenApp(options) {
+      const { scheme, name, fallbackMessage } = options;
+      const actionLabel = name || '应用';
+      const fallbackText = fallbackMessage || `如果没有自动打开${actionLabel}，请手动启动。`;
+
+      setStatusMessage(`正在尝试打开${actionLabel}…`);
+
+      let successClearTimer = null;
+      const fallbackTimer = setTimeout(function() {
+        setStatusMessage(fallbackText);
+        cleanup();
       }, 2000);
+
+      function cleanup() {
+        clearTimeout(fallbackTimer);
+        if (successClearTimer) {
+          clearTimeout(successClearTimer);
+          successClearTimer = null;
+        }
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+
+      function handleVisibilityChange() {
+        if (document.hidden) {
+          cleanup();
+          setStatusMessage(`${actionLabel} 似乎已经打开。祝您使用愉快！`);
+          successClearTimer = setTimeout(function() {
+            setStatusMessage('');
+          }, 2500);
+        }
+      }
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.location.href = scheme;
+    }
+
+    document.getElementById('openWeixin').addEventListener('click', function() {
+      tryOpenApp({ scheme: 'weixin://', name: '微信' });
+    });
+
+    document.getElementById('openAlipay').addEventListener('click', function() {
+      tryOpenApp({ scheme: 'alipay://', name: '支付宝' });
     });
   </script>
 </body>
