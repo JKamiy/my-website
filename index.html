@@ -1,193 +1,245 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>打开微信或支付宝</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>TripGenie · Disney Ticket</title>
   <style>
     :root {
-      color-scheme: light dark;
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+      --chip: #eef2ff;
     }
-
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    html, body { margin: 0; padding: 0; overflow-x: hidden; }
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Responsive app that fills the viewport; no horizontal scroll */
+    .app {
+      width: 100vw;
+      height: 100dvh;          /* dynamic viewport on iOS; avoids URL bar issues */
+      height: 100svh;          /* fallback for older iOS */
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      overflow-y: auto;        /* vertical scroll allowed if content grows */
+      overflow-x: hidden;      /* enforce no horizontal scroll */
+    }
+
+    /* Top-level sections */
+    .topbar {
+      background: var(--card);
+      padding: 14px 16px;
+      display: flex;
       align-items: center;
-      min-height: 100vh;
-      background: linear-gradient(160deg, #f6f9fc 0%, #eef2f7 100%);
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
     }
+    .logo { font-weight: 800; letter-spacing: .2px; }
+    .logo .dot { color: #2563eb; }
+    .status { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
 
-    main.app-launcher {
-      width: min(320px, 92vw);
-      padding: 32px 24px;
-      border-radius: 20px;
-      background-color: rgba(255, 255, 255, 0.92);
-      box-shadow: 0 18px 45px -24px rgba(15, 50, 81, 0.45);
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      padding: 14px 12px 2px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+    @media (max-width: 480px) {
+      .grid { grid-template-columns: repeat(5, minmax(0,1fr)); }
+      .icon span { font-size: 11px; }
+    }
+    .icon { text-align: center; padding: 6px 0 10px; }
+    .icon .glyph { font-size: 22px; display: block; }
+    .icon span { font-size: 12px; color: var(--text); word-break: keep-all; }
+
+    .chat {
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      text-align: center;
+      gap: 10px;
+      flex: 1 1 auto;
+      min-height: 0; /* allow flex child to shrink without causing overflow-x */
     }
+    .assistant-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+    .assistant-head { display:flex; align-items:center; justify-content: space-between; }
+    .agent { display:flex; align-items:center; gap:8px; font-weight:600; }
+    .avatar { width:22px; height:22px; border-radius:50%; background:#e0e7ff; display:grid; place-items:center; font-size:14px; }
+    .hint { color: var(--muted); text-align:center; font-size:12px; margin: 14px 0; }
 
-    h1 {
-      margin: 0;
-      color: #1f2933;
-      font-size: clamp(1.35rem, 5vw, 1.75rem);
-    }
+    .user-bubble { align-self: center; background:#334155; color:#fff; padding: 10px 14px; border-radius: 999px; font-weight:600; max-width: 90%; }
 
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+    .answer { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
 
-    button {
-      appearance: none;
-      border: none;
-      border-radius: 12px;
-      padding: 16px 20px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
-      box-shadow: 0 12px 22px -16px rgba(0, 0, 0, 0.45);
-    }
+    .order-card { margin-top: 12px; border: 1px dashed var(--border); border-radius: 12px; background: #fcfcff; padding: 12px; }
+    .order-title { font-weight: 700; display:flex; align-items:center; gap:8px; }
+    .badge { background:#ecfeff; border:1px solid #cffafe; color:#0ea5e9; padding:2px 8px; border-radius:999px; font-size:12px; }
+    .order-grid { display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin:10px 0; font-size:14px; }
+    @media (max-width: 480px) { .order-grid { grid-template-columns: 1fr; } }
+    .order-grid div { background:#fff; border:1px solid var(--border); border-radius:8px; padding:8px; }
+    .price-row { display:flex; align-items:center; justify-content:space-between; margin-top:6px; font-weight:700; }
+    .actions { display:flex; gap:8px; margin-top:10px; flex-wrap: wrap; }
+    .btn { appearance:none; border:1px solid var(--border); background:#fff; border-radius:999px; padding:10px 14px; cursor:pointer; font-weight:600; }
+    .btn-primary { background: var(--primary); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(37,99,235,.25); }
 
-    button:focus-visible {
-      outline: 3px solid rgba(255, 255, 255, 0.65);
-      outline-offset: 3px;
-    }
+    .tools { display:flex; gap:10px; margin-top:10px; }
+    .tool-btn { flex:1; background: var(--card); border:1px solid var(--border); padding: 10px 12px; border-radius: 10px; font-weight:600; cursor:pointer; }
 
-    button:active {
-      transform: scale(0.98);
-    }
+    .composer { position: sticky; bottom: 0; background: var(--card); border-top:1px solid var(--border); padding: 10px; display:flex; gap:8px; }
+    .composer input { flex:1; border:1px solid var(--border); border-radius:999px; padding:10px 14px; font-size:14px; }
+    .send { border:0; background: var(--primary); color:#fff; border-radius:999px; padding: 0 14px; font-weight:700; cursor:pointer; }
 
-    #openWeixin {
-      background: linear-gradient(135deg, #1aad19, #0f8e13);
-    }
-
-    #openWeixin:hover {
-      filter: brightness(1.05);
-    }
-
-    #openAlipay {
-      background: linear-gradient(135deg, #1677ff, #0f5ed1);
-    }
-
-    #openAlipay:hover {
-      filter: brightness(1.05);
-    }
-
-    .hint {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #4b5563;
-    }
-
-    #statusMessage {
-      margin: 0;
-      font-size: 0.95rem;
-      color: #374151;
-      min-height: 1.2em;
-    }
-
-    #statusMessage[hidden] {
-      display: none;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      body {
-        background: radial-gradient(circle at top, #253244, #0f172a 70%);
-      }
-
-      main.app-launcher {
-        background-color: rgba(15, 23, 42, 0.85);
-        box-shadow: 0 22px 48px -28px rgba(0, 0, 0, 0.85);
-      }
-
-      h1 {
-        color: #f8fafc;
-      }
-
-      .hint,
-      #statusMessage {
-        color: #cbd5f5;
-      }
-    }
+    /* Test runner styles */
+    .tests { margin: 10px 12px 0; background: #fff; border:1px solid var(--border); border-radius: 12px; padding: 12px; }
+    .tests h4 { margin: 0 0 8px; }
+    .test-result { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; margin: 4px 0; }
+    .pass { color: #16a34a; }
+    .fail { color: #dc2626; }
   </style>
 </head>
 <body>
-  <main class="app-launcher">
-    <h1>选择要打开的应用</h1>
-    <div class="button-group">
-      <button id="openWeixin" type="button">打开微信</button>
-      <button id="openAlipay" type="button">打开支付宝</button>
-    </div>
-    <p class="hint">若无反应，请确认您已安装对应的客户端。</p>
-    <p id="statusMessage" hidden aria-live="polite"></p>
+  <main class="app" id="app" role="main" aria-label="TripGenie responsive app">
+    <header class="topbar">
+      <div class="logo">Trip<span class="dot">.</span>com</div>
+      <div class="status">Silver · <span aria-hidden>🔔</span></div>
+    </header>
+
+    <section class="grid" aria-label="Quick links">
+      <div class="icon"><span class="glyph">🏨</span><span>Hotels</span></div>
+      <div class="icon"><span class="glyph">✈️</span><span>Flights</span></div>
+      <div class="icon"><span class="glyph">🧳</span><span>Flight + Hotel</span></div>
+      <div class="icon"><span class="glyph">🚆</span><span>Trains</span></div>
+      <div class="icon"><span class="glyph">➕</span><span>More</span></div>
+    </section>
+
+    <section class="chat" aria-label="Conversation">
+      <div class="assistant-card">
+        <div class="assistant-head">
+          <div class="agent"><span class="avatar">🤖</span>TripGenie</div>
+          <div style="color:var(--muted); font-size:14px;">🔇</div>
+        </div>
+        <p class="hint">Scroll down to see the history</p>
+        <div class="user-bubble">I want to buy the Disney ticket</div>
+
+        <article class="answer" id="answerBlock">
+          <!-- Order card with a working Pay Now button -->
+          <div class="order-card" aria-label="Disney ticket order">
+            <div class="order-title">Disney Ticket Order <span class="badge">Pending</span></div>
+            <div class="order-grid">
+              <div><strong>Park</strong><br/>Disneyland Park · California</div>
+              <div><strong>Date</strong><br/>2025-06-18</div>
+              <div><strong>Ticket Type</strong><br/>1-Day 1-Park</div>
+              <div><strong>Guests</strong><br/>2</div>
+              <div><strong>Order ID</strong><br/>TG123456789</div>
+              <div><strong>Payment Methods</strong><br/>Apple Pay / Card</div>
+            </div>
+            <div class="price-row">
+              <div>Amount Due</div>
+              <div>USD <span style="font-size:18px;">218.00</span></div>
+            </div>
+            <div class="actions">
+              <button class="btn" id="viewOrder">View Order</button>
+              <button class="btn btn-primary" id="payNow" data-paylink="https://pay.example.com/checkout?orderId=TG123456789&amount=21800&currency=USD">Pay Now</button>
+            </div>
+          </div>
+        </article>
+
+        <div class="tools">
+          <button class="tool-btn">Compare hotels</button>
+          <button class="tool-btn">Recognize image</button>
+          <button class="tool-btn">Live translate</button>
+        </div>
+
+        <!-- Minimal test runner -->
+        <div class="tests" id="tests">
+          <h4>Self Tests</h4>
+          <div id="test-results"></div>
+          <button class="btn" id="run-tests">Run Tests</button>
+        </div>
+      </div>
+
+      <div class="composer" role="search">
+        <input placeholder="Ask me anything about travel" aria-label="Message input" />
+        <button class="send">➤</button>
+      </div>
+    </section>
   </main>
 
   <script>
-    const statusMessage = document.getElementById('statusMessage');
-    const weixinButton = document.getElementById('openWeixin');
-    const alipayButton = document.getElementById('openAlipay');
-
-    function setStatusMessage(text) {
-      if (text) {
-        statusMessage.textContent = text;
-        statusMessage.hidden = false;
-      } else {
-        statusMessage.textContent = '';
-        statusMessage.hidden = true;
-      }
+    // App interactivity
+    function buildOrderMessage() {
+      return `Order details:\nOrder ID TG123456789\nTicket 1-Day 1-Park\nDate 2025-06-18\nAmount USD 218.00`;
     }
 
-    function tryOpenApp(options) {
-      const { scheme, name, fallbackMessage } = options;
-      const actionLabel = name || '应用';
-      const fallbackText = fallbackMessage || `如果没有自动打开${actionLabel}，请手动启动。`;
+    const payBtn = document.getElementById('payNow');
+    payBtn?.addEventListener('click', (e) => {
+      const url = e.currentTarget.dataset.paylink;
+      window.open(url, '_blank');
+    });
 
-      setStatusMessage(`正在尝试打开${actionLabel}…`);
+    const viewBtn = document.getElementById('viewOrder');
+    viewBtn?.addEventListener('click', () => {
+      alert(buildOrderMessage());
+    });
 
-      let successClearTimer = null;
-      const fallbackTimer = setTimeout(function () {
-        setStatusMessage(fallbackText);
-        cleanup();
-      }, 2000);
-
-      function cleanup() {
-        clearTimeout(fallbackTimer);
-        if (successClearTimer) {
-          clearTimeout(successClearTimer);
-          successClearTimer = null;
-        }
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      }
-
-      function handleVisibilityChange() {
-        if (document.hidden) {
-          cleanup();
-          setStatusMessage(`${actionLabel} 似乎已经打开。祝您使用愉快！`);
-          successClearTimer = setTimeout(function () {
-            setStatusMessage('');
-          }, 2500);
-        }
-      }
-
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      window.location.href = scheme;
+    // --- Responsive tests (no horizontal scroll; viewport fit) ---
+    function expect(name, condition, info = "") {
+      const row = document.createElement('div');
+      row.className = 'test-result ' + (condition ? 'pass' : 'fail');
+      row.textContent = (condition ? 'PASS' : 'FAIL') + ' — ' + name + (info ? ' (' + info + ')' : '');
+      document.getElementById('test-results').appendChild(row);
     }
 
-    weixinButton.addEventListener('click', function () {
-      tryOpenApp({ scheme: 'weixin://', name: '微信' });
-    });
+    function clearResults(){
+      const c = document.getElementById('test-results');
+      c.innerHTML = '';
+    }
 
-    alipayButton.addEventListener('click', function () {
-      tryOpenApp({ scheme: 'alipay://', name: '支付宝' });
-    });
+    function runTests(){
+      clearResults();
+      const app = document.getElementById('app');
+
+      // T1: No horizontal scroll on document and app
+      expect('Document: no horizontal scroll', document.documentElement.scrollWidth <= window.innerWidth + 1, document.documentElement.scrollWidth + ' vs ' + window.innerWidth);
+      expect('Body: no horizontal scroll', document.body.scrollWidth <= window.innerWidth + 1, document.body.scrollWidth + ' vs ' + window.innerWidth);
+      expect('App: no horizontal overflow', app.scrollWidth <= app.clientWidth + 1, app.scrollWidth + ' vs ' + app.clientWidth);
+
+      // T2: App width equals viewport width (±1px tolerance)
+      const appRect = app.getBoundingClientRect();
+      expect('App width ~ viewport width', Math.abs(appRect.width - window.innerWidth) <= 1, appRect.width + ' vs ' + window.innerWidth);
+
+      // T3: App height equals dynamic viewport height (±3px tolerance)
+      expect('App height ~ viewport height', Math.abs(appRect.height - window.innerHeight) <= 3, appRect.height + ' vs ' + window.innerHeight);
+
+      // T4: Pay Now link present and https
+      const pay = document.getElementById('payNow');
+      expect('Pay Now has data-paylink', !!pay?.dataset?.paylink);
+      expect('Paylink looks like https URL', /^https:\/\//.test(pay?.dataset?.paylink || ''));
+
+      // T5: Order message multi-line and contains ID
+      const msg = buildOrderMessage();
+      expect('Order message has 5 lines', msg.split('\n').length === 5, msg.replace(/\n/g,' | '));
+      expect('Order message mentions Order ID', msg.includes('Order ID TG123456789'));
+    }
+
+    document.getElementById('run-tests')?.addEventListener('click', runTests);
+    window.addEventListener('load', runTests);
+    window.addEventListener('resize', runTests);
+    window.addEventListener('orientationchange', () => setTimeout(runTests, 50));
   </script>
 </body>
 </html>
