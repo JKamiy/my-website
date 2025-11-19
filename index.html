@@ -1,1222 +1,688 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Trip.com · Stablecoin Payment</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <style>
-    :root {
-      --bg-page: #f3f4f6;
-      --bg-card: #f9fafb;
-      --border-subtle: #e5e7eb;
-      --border-strong: #d1d5db;
-      --primary: #0086ff;
-      --primary-soft: rgba(0, 134, 255, 0.08);
-      --primary-soft-strong: rgba(0, 134, 255, 0.12);
-      --danger: #ef4444;
-      --success: #16a34a;
-      --text-main: #111827;
-      --text-subtle: #6b7280;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --shadow-main: 0 12px 30px rgba(15,23,42,0.16);
-      --transition-fast: 0.16s ease-out;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg-page);
-      color: var(--text-main);
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 16px 12px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      border-radius: 18px;
-      border: 1px solid rgba(15,23,42,0.06);
-      box-shadow: var(--shadow-main);
-      padding: 14px 14px 18px;
-    }
-
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: baseline;
-      gap: 2px;
-      font-weight: 600;
-      letter-spacing: .01em;
-      font-size: 16px;
-      color: var(--primary);
-    }
-
-    .logo span {
-      color: #111827;
-      font-weight: 500;
-    }
-
-    .top-status {
-      font-size: 11px;
-      color: var(--text-subtle);
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
-    }
-
-    .top-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-    }
-
-    .page-title {
-      margin: 0 0 2px;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .page-subtitle {
-      margin: 0 0 12px;
-      font-size: 12px;
-      color: var(--text-subtle);
-    }
-
-    main {
-      font-size: 13px;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-subtle);
-      padding: 10px 10px 9px;
-      margin-bottom: 10px;
-    }
-
-    .card-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      gap: 8px;
-    }
-
-    .card-title {
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .card-subtitle {
-      font-size: 11px;
-      color: var(--text-subtle);
-    }
-
-    .amount-main {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .amount-sub {
-      font-size: 11px;
-      color: var(--text-subtle);
-      margin-top: 2px;
-    }
-
-    .tag {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-subtle);
-      background: #ffffff;
-      white-space: nowrap;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: 4px;
-    }
-
-    .field label {
-      font-size: 12px;
-      color: var(--text-subtle);
-    }
-
-    .options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .option-card {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 9px;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: #ffffff;
-      cursor: pointer;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
-    }
-
-    .option-card:hover {
-      border-color: var(--primary);
-      box-shadow: 0 6px 16px rgba(15,23,42,0.1);
-      transform: translateY(-0.5px);
-    }
-
-    .option-card input[type="radio"] {
-      accent-color: var(--primary);
-      margin: 0;
-      flex-shrink: 0;
-    }
-
-    .option-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .option-title {
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .option-subtitle {
-      font-size: 11px;
-      color: var(--text-subtle);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .option-card input[type="radio"]:checked ~ .option-content {
-      border-radius: 999px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      background: var(--primary-soft);
-      box-shadow: 0 0 0 1px rgba(0,134,255,0.75);
-    }
-
-    select,
-    input[type="text"] {
-      width: 100%;
-      padding: 8px 9px;
-      border-radius: 999px;
-      border: 1px solid var(--border-strong);
-      background: #ffffff;
-      font-size: 13px;
-      outline: none;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
-      appearance: none;
-    }
-
-    select:focus,
-    input[type="text"]:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 1px rgba(0,134,255,0.8);
-      background: #ffffff;
-    }
-
-    .help-text {
-      font-size: 11px;
-      color: var(--text-subtle);
-    }
-
-    .risk-note {
-      margin-top: 6px;
-      padding: 7px 8px;
-      border-radius: 11px;
-      background: #ffffff;
-      border: 1px dashed var(--border-strong);
-      font-size: 11px;
-      color: var(--text-subtle);
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--text-subtle);
-    }
-
-    .checkbox-row input[type="checkbox"] {
-      margin-top: 2px;
-      accent-color: var(--primary);
-      flex-shrink: 0;
-    }
-
-    .mode-section {
-      margin-top: 8px;
-      border-radius: 12px;
-      border: 1px dashed var(--border-strong);
-      padding: 8px 8px 9px;
-      background: #ffffff;
-    }
-
-    .mode-title {
-      font-size: 12px;
-      font-weight: 500;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .qr-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .fake-qr {
-      width: 164px;
-      height: 164px;
-      border-radius: 18px;
-      background:
-        repeating-linear-gradient(45deg, #111827 0, #111827 5px, #e5e7eb 5px, #e5e7eb 10px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .fake-qr::after {
-      content: "";
-      position: absolute;
-      inset: 18px;
-      border-radius: 12px;
-      background:
-        repeating-linear-gradient(135deg, #111827 0, #111827 3px, #f9fafb 3px, #f9fafb 6px);
-      mix-blend-mode: multiply;
-      opacity: 0.9;
-    }
-
-    .code-box {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 11px;
-      padding: 7px 8px;
-      border-radius: 11px;
-      background: #f3f4f6;
-      border: 1px solid var(--border-strong);
-      word-break: break-all;
-    }
-
-    .buttons-row {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: stretch;
-    }
-
-    button {
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: 999px;
-      padding: 9px 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
-      user-select: none;
-      width: 100%;
-    }
-
-    button.primary {
-      background: linear-gradient(135deg, #0094ff, #006dff);
-      color: #ffffff;
-      box-shadow:
-        0 10px 18px rgba(0,109,255,0.25);
-    }
-
-    button.primary:hover {
-      box-shadow:
-        0 14px 26px rgba(0,109,255,0.3);
-      transform: translateY(-0.5px);
-    }
-
-    button.ghost {
-      background: #ffffff;
-      color: var(--text-main);
-      border: 1px solid var(--border-strong);
-    }
-
-    button.ghost:hover {
-      background: #f3f4f6;
-    }
-
-    button[disabled] {
-      opacity: 0.45;
-      cursor: default;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .validation-message {
-      margin-top: 3px;
-      font-size: 11px;
-    }
-
-    .validation-message.error {
-      color: var(--danger);
-    }
-
-    .validation-message.success {
-      color: var(--success);
-    }
-
-    .view {
-      display: none;
-    }
-
-    .view.active {
-      display: block;
-    }
-
-    .waiting-layout {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 8px;
-    }
-
-    .spinner {
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      border: 3px solid #e5e7eb;
-      border-top-color: var(--primary);
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .timeline {
-      font-size: 12px;
-      color: var(--text-subtle);
-    }
-
-    .success-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      text-align: center;
-    }
-
-    .success-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 25% 20%, #bbf7d0, #22c55e 40%, #16a34a 70%, #052e16 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow:
-        0 12px 24px rgba(16,185,129,0.35);
-    }
-
-    .success-icon svg {
-      width: 30px;
-      height: 30px;
-      fill: none;
-      stroke: white;
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .success-title {
-      font-size: 17px;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .success-text {
-      font-size: 12px;
-      color: var(--text-subtle);
-      margin: 0;
-    }
-
-    .success-details {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px;
-      font-size: 11px;
-      margin-top: 6px;
-    }
-
-    .detail-item {
-      text-align: left;
-    }
-
-    .detail-item span.label {
-      display: block;
-      color: var(--text-subtle);
-      margin-bottom: 1px;
-    }
-
-    .detail-item span.value {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      word-break: break-all;
-    }
-
-    .tip-banner {
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--text-subtle);
-    }
-
-    .coin-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: #ffffff;
-      flex-shrink: 0;
-      box-shadow: 0 4px 8px rgba(15,23,42,0.22);
-    }
-
-    .coin-usdt {
-      background: linear-gradient(135deg, #16a34a, #15803d);
-    }
-
-    .coin-usdc {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    }
-
-    .mode-tag {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: var(--primary-soft);
-      color: var(--primary);
-      border: 1px solid rgba(0,134,255,0.3);
-      flex-shrink: 0;
-    }
-
-    .identity-note {
-      margin-top: 4px;
-      padding: 6px 8px;
-      border-radius: 10px;
-      background: rgba(0,134,255,0.06);
-      border: 1px dashed rgba(0,134,255,0.35);
-      font-size: 11px;
-      color: var(--text-main);
-    }
-
-    .identity-note strong {
-      font-weight: 600;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trip.com Style Checkout</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #F0F2F5;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .trip-blue { color: #287DFA; }
+        .bg-trip-blue { background-color: #287DFA; }
+        .border-trip-blue { border-color: #287DFA; }
+
+        /* Page Transitions */
+        .slide-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .page-step {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            background-color: #F0F2F5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-active { transform: translateX(0); opacity: 1; z-index: 10; }
+        .step-next { transform: translateX(100%); opacity: 0; z-index: 5; }
+        .step-prev { transform: translateX(-100%); opacity: 0; z-index: 5; }
+
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Method Selector Styles */
+        .method-card { transition: all 0.2s ease; overflow: hidden; }
+        .method-header { transition: background-color 0.2s ease; }
+        .method-body { max-height: 0; opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+        
+        .method-selected { border-color: #287DFA; background-color: #fff; box-shadow: 0 4px 6px -1px rgba(40, 125, 250, 0.1); }
+        .method-selected .method-header { background-color: #F0F7FF; color: #287DFA; }
+        .method-selected .method-body { max-height: 800px; opacity: 1; padding-bottom: 1rem; }
+
+        /* Input Styles */
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus { border-color: #287DFA; }
+    </style>
 </head>
-<body>
-<div class="container">
-  <header class="top-bar">
-    <div class="logo">Trip<span>.com</span></div>
-    <div class="top-status">
-      <span class="top-dot"></span>
-      Secure payment
+<body class="text-gray-800 antialiased h-screen overflow-hidden flex flex-col">
+
+    <!-- MAIN CONTAINER -->
+    <div class="w-full max-w-md mx-auto bg-white h-full flex flex-col shadow-2xl relative">
+
+        <!-- HEADER -->
+        <header class="bg-white px-4 py-3 flex items-center justify-between z-30 shadow-sm shrink-0">
+            <button onclick="handleBack()" class="text-gray-600 text-xl p-2 hover:bg-gray-100 rounded-full transition w-10 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h1 class="text-lg font-bold text-gray-800" id="header-title">Checkout</h1>
+            <div class="w-10"></div> 
+        </header>
+
+        <!-- SLIDER CONTAINER -->
+        <div class="slide-container flex-1 relative">
+
+            <!-- === STEP 1: PAYMENT METHOD SELECTION === -->
+            <div id="step-1" class="page-step step-active">
+                <!-- Timer -->
+                <div class="bg-[#FFF8E1] text-[#8A6D3B] text-sm px-4 py-2 flex items-center justify-center gap-2 shrink-0">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Pay within <b class="timer-display">14:59</b></span>
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 p-4 overflow-y-auto scroll-smooth pb-20">
+                    
+                    <!-- Amount Summary -->
+                    <div class="mb-6 text-center">
+                        <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">Total Amount</p>
+                        <div class="text-3xl font-bold trip-blue">
+                            <span class="text-xl align-top">$</span>1,248.50
+                        </div>
+                    </div>
+
+                    <!-- Method List -->
+                    <div class="space-y-3">
+
+                        <!-- Method 1: Bank Card (Moved to Top - Default) -->
+                        <div id="method-card" class="method-card method-selected border border-gray-200 rounded-xl" onclick="selectMethod('card')">
+                            <div class="method-header p-4 flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                        <i class="fa-regular fa-credit-card"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-sm">Credit / Debit Card</div>
+                                        <div class="flex gap-1 mt-0.5">
+                                            <i class="fa-brands fa-cc-visa text-gray-400 text-xs"></i>
+                                            <i class="fa-brands fa-cc-mastercard text-gray-400 text-xs"></i>
+                                            <i class="fa-brands fa-cc-amex text-gray-400 text-xs"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border border-gray-300 radio-indicator flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full hidden selected-dot"></div>
+                                </div>
+                            </div>
+
+                            <div class="method-body px-4">
+                                <div class="pt-2 border-t border-gray-100 space-y-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Card Number</label>
+                                        <div class="relative">
+                                            <input type="tel" placeholder="0000 0000 0000 0000" class="input-field pl-10" maxlength="19">
+                                            <i class="fa-regular fa-credit-card absolute left-3.5 top-3.5 text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <div class="flex-1">
+                                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Expiry</label>
+                                            <input type="tel" placeholder="MM/YY" class="input-field text-center" maxlength="5">
+                                        </div>
+                                        <div class="flex-1">
+                                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">CVV</label>
+                                            <input type="tel" placeholder="123" class="input-field text-center" maxlength="3">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Cardholder Name</label>
+                                        <input type="text" placeholder="YOUR NAME" class="input-field uppercase">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Method 2: Apple Pay (No Button Inside) -->
+                        <div id="method-apple" class="method-card border border-gray-200 rounded-xl" onclick="selectMethod('apple')">
+                            <div class="method-header p-4 flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-white">
+                                        <i class="fa-brands fa-apple"></i>
+                                    </div>
+                                    <div class="font-bold text-sm">Apple Pay</div>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border border-gray-300 radio-indicator flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full hidden selected-dot"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="method-body px-4">
+                                <div class="pt-2 pb-2">
+                                    <p class="text-xs text-gray-500 mb-1">Use Face ID or Touch ID to verify payment securely.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Method 3: Crypto -->
+                        <div id="method-crypto" class="method-card border border-gray-200 rounded-xl" onclick="selectMethod('crypto')">
+                            <div class="method-header p-4 flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                        <i class="fa-solid fa-coins"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-sm">Stable Coin</div>
+                                        <div class="text-[10px] text-gray-400">USDT / USDC</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-red-100 text-red-600 text-[9px] font-bold px-1.5 py-0.5 rounded">RECOMMENDED</span>
+                                    <div class="w-4 h-4 rounded-full border border-gray-300 radio-indicator flex items-center justify-center">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full hidden selected-dot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="method-body px-4">
+                                <!-- Config Section for Crypto -->
+                                <div class="pt-2 border-t border-blue-100/50">
+                                    <label class="text-xs font-bold text-gray-500 block mb-2 mt-2">Select Currency</label>
+                                    <div class="flex bg-gray-100 p-1 rounded-lg mb-4">
+                                        <button onclick="selectCoin(event, 'USDT')" id="btn-usdt" class="flex-1 py-2 rounded-md text-xs font-bold shadow-sm bg-white text-blue-600 transition-all flex items-center justify-center gap-1">
+                                            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="w-4 h-4" alt="USDT"> USDT
+                                        </button>
+                                        <button onclick="selectCoin(event, 'USDC')" id="btn-usdc" class="flex-1 py-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all flex items-center justify-center gap-1">
+                                            <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="w-4 h-4" alt="USDC"> USDC
+                                        </button>
+                                    </div>
+
+                                    <label class="text-xs font-bold text-gray-500 block mb-2">Select Network</label>
+                                    <div class="grid grid-cols-2 gap-2" id="chain-container">
+                                        <!-- Chains injected by JS -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer Step 1 -->
+                <div class="bg-white border-t border-gray-200 p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] relative z-20">
+                    <button id="main-action-btn" onclick="handleMainAction()" class="w-full bg-trip-blue text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
+                        Pay $1,248.50
+                    </button>
+                </div>
+            </div>
+
+            <!-- === STEP 2: CRYPTO EXECUTION (Only for Crypto) === -->
+            <div id="step-2" class="page-step step-next">
+                <!-- Timer Mini -->
+                <div class="bg-blue-50 text-blue-600 text-xs px-4 py-1.5 flex items-center justify-center gap-2 shrink-0 border-b border-blue-100">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Time remaining: <b class="timer-display">14:59</b></span>
+                </div>
+
+                <!-- Method Tabs -->
+                <div class="bg-white px-4 pt-2 shadow-sm z-10 shrink-0">
+                    <div class="flex border-b border-gray-200">
+                        <button onclick="setPaymentMode('scan')" id="tab-scan" class="flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">Scan QR</button>
+                        <button onclick="setPaymentMode('manual')" id="tab-manual" class="flex-1 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-colors">Verify & Transfer</button>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="flex-1 overflow-y-auto bg-white p-4 relative">
+                    
+                    <!-- MODE A: Scan QR -->
+                    <div id="view-scan" class="flex flex-col items-center justify-center h-full py-2 fade-in">
+                        <div class="bg-white p-4 border border-gray-200 rounded-2xl shadow-sm mb-6 relative">
+                            <!-- Enlarged QR Code -->
+                            <img id="qr-image" src="" alt="QR Code" class="w-64 h-64 rounded-lg object-contain bg-gray-50">
+                            <div class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 hidden" id="qr-loader">
+                                <div class="loader w-8 h-8 border-4"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Enlarged Address Box -->
+                        <div class="w-full bg-gray-50 rounded-xl p-4 flex items-center justify-between border border-gray-200 mb-2 shadow-sm">
+                            <div class="flex flex-col overflow-hidden mr-3">
+                                <span class="text-xs text-gray-400 uppercase font-bold mb-1">Deposit Address</span>
+                                <span id="scan-address-text" class="text-base font-mono text-gray-800 truncate font-bold tracking-tight">...</span>
+                            </div>
+                            <!-- Enlarged Copy Button -->
+                            <button onclick="copyAddress()" class="text-blue-600 bg-white border border-gray-200 w-12 h-12 flex items-center justify-center rounded-xl hover:bg-blue-50 shadow-sm transition active:scale-95">
+                                <i class="fa-regular fa-copy text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- MODE B: Manual Verification -->
+                    <div id="view-manual" class="hidden h-full flex flex-col pt-2 fade-in">
+                        <div id="manual-step-1" class="flex-1">
+                            <div class="bg-blue-50 rounded-lg p-3 mb-4 text-xs text-blue-800 leading-relaxed border border-blue-100">
+                                <strong class="block mb-1"><i class="fa-solid fa-shield-halved mr-1"></i> Security Check</strong>
+                                Verify your sending wallet address to ensure refund safety and prevent fraud.
+                            </div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Your Wallet Address</label>
+                            <textarea id="user-wallet-input" placeholder="Paste your wallet address here..." class="w-full h-24 border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500 resize-none mb-4 bg-gray-50"></textarea>
+                            <button onclick="verifyWallet()" id="verify-btn" class="w-full py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 transition shadow-sm">
+                                Verify Wallet
+                            </button>
+                        </div>
+
+                        <div id="manual-step-2" class="hidden flex-1">
+                            <div class="flex items-center justify-center gap-2 text-green-600 text-sm font-bold mb-6 bg-green-50 py-2 rounded border border-green-100">
+                                <i class="fa-solid fa-check-circle"></i> Wallet Verified
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-xs text-gray-400 uppercase font-bold">Network</label>
+                                    <div class="font-bold text-gray-800 flex items-center gap-2">
+                                        <span id="summary-chain">TRC20</span>
+                                        <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full border border-gray-200">Exact Match Required</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-400 uppercase font-bold">Deposit Address</label>
+                                    <div class="flex gap-2 mt-1">
+                                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-base font-mono text-gray-700 break-all flex-1 leading-relaxed" id="deposit-address">...</div>
+                                        <button onclick="copyAddress()" class="bg-white border border-gray-200 text-blue-600 rounded-lg w-12 flex items-center justify-center shrink-0 shadow-sm active:bg-gray-50">
+                                            <i class="fa-regular fa-copy text-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Step 2 -->
+                <div class="bg-white border-t border-gray-200 p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                    <div class="bg-red-50 border border-red-100 text-red-600 text-[11px] p-2.5 rounded-lg mb-3 text-center leading-tight">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                        Only send <strong id="warn-coin">USDT</strong> via <strong id="warn-chain">TRC20</strong>. Other assets will be lost.
+                    </div>
+                    <button onclick="simulatePayment()" class="w-full bg-trip-blue text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
+                        I Have Paid
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- OVERLAYS -->
+        <div id="toast" class="absolute top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-2 px-4 rounded-full shadow-lg opacity-0 transition-opacity z-50 flex items-center gap-2 pointer-events-none">
+            <i class="fa-solid fa-check text-green-400"></i>
+            <span id="toast-msg">Copied</span>
+        </div>
+
+        <!-- NEW: Pending Information Overlay -->
+        <div id="payment-pending-info" class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center hidden fade-in p-6 text-center">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-500 text-2xl">
+                <i class="fa-solid fa-hourglass-start animate-pulse"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Payment Submitted</h2>
+            <p class="text-gray-500 text-sm mb-6 max-w-xs">We are verifying your transaction on the blockchain. This usually takes <strong class="text-gray-800">1-5 minutes</strong>.</p>
+            
+            <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 text-left w-full mb-8">
+                <div class="flex gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-orange-500 mt-0.5"></i>
+                    <div class="text-xs text-orange-700 leading-relaxed">
+                        <strong class="block mb-1 text-orange-800">Important Warning</strong>
+                        Please do NOT pay again. Duplicate payments will be refunded automatically, but the received amount will be less due to network gas fees being deducted.
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-400 mt-4">You will be redirected automatically...</p>
+        </div>
+
+        <!-- Processing Spinner (Used for short transitions) -->
+        <div id="payment-processing" class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center hidden">
+            <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+            <h2 class="font-bold text-gray-800">Processing</h2>
+            <p class="text-gray-500 text-xs mt-1">Securely verifying transaction...</p>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="payment-success" class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center hidden fade-in px-6">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-500 text-3xl">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
+            <p class="text-gray-500 text-xs text-center mb-8">Your booking has been confirmed.</p>
+            <button onclick="location.reload()" class="w-full border border-trip-blue text-blue-600 font-bold py-3 rounded-xl">Return to Payment Home</button>
+        </div>
+
     </div>
-  </header>
 
-  <main>
-    <!-- SETUP VIEW: coin + network -->
-    <section id="view-setup" class="view active">
-      <h1 class="page-title">Pay with stablecoin</h1>
-      <p class="page-subtitle">
-        Select currency and network first. On-chain transfers are final and cannot be reversed.
-      </p>
+    <script>
+        // --- Configuration ---
+        const config = {
+            USDT: {
+                chains: [
+                    { name: 'TRC20',    fee: '~$0.8',  recommended: true,  address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' },
+                    { name: 'ERC20',    fee: '~$4.5',  recommended: false, address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
+                    { name: 'BEP20',    fee: '~$0.15', recommended: false, address: '0x55d398326f99059fF775485246999027B3197955' },
+                    { name: 'SOL',      fee: '<$0.01', recommended: true,  address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' },
+                    { name: 'POLYGON',  fee: '<$0.02', recommended: false, address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F' },
+                    { name: 'ARBITRUM', fee: '~$0.10', recommended: false, address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9' },
+                    { name: 'OPTIMISM', fee: '~$0.12', recommended: false, address: '0x94b008aA00579c1307B0EF2c499aD98a8ce98e26' },
+                    { name: 'AVAX-C',   fee: '~$0.20', recommended: false, address: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7' }
+                ]
+            },
+            USDC: {
+                chains: [
+                    { name: 'ERC20',    fee: '~$4.5',  recommended: false, address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' },
+                    { name: 'SOL',      fee: '<$0.01', recommended: true,  address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
+                    { name: 'POLYGON',  fee: '<$0.02', recommended: true,  address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' },
+                    { name: 'BEP20',    fee: '~$0.15', recommended: false, address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d' },
+                    { name: 'ARBITRUM', fee: '~$0.10', recommended: false, address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' },
+                    { name: 'OPTIMISM', fee: '~$0.12', recommended: false, address: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' },
+                    { name: 'AVAX-C',   fee: '~$0.20', recommended: false, address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E' }
+                ]
+            }
+        };
 
-      <div class="card">
-        <div class="card-title-row">
-          <div>
-            <div class="card-title">Order summary</div>
-            <div class="card-subtitle" id="orderMeta">Hotel booking · Demo only</div>
-          </div>
-          <div class="amount-main" id="orderAmount">$120.00</div>
-        </div>
-        <div class="amount-sub">Exact amount and currency should be provided by backend.</div>
-      </div>
+        let state = {
+            step: 1,
+            method: 'card', // Default is now Card
+            coin: 'USDT',
+            chain: config.USDT.chains[0].name,
+            mode: 'scan',
+            address: config.USDT.chains[0].address,
+            walletVerified: false
+        };
 
-      <div class="card">
-        <div class="card-title-row">
-          <div class="card-title">Stablecoin</div>
-          <span class="tag">USDT / USDC</span>
-        </div>
-        <div class="card-subtitle">Choose which stablecoin you want to use.</div>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="coin" value="USDT" checked />
-            <div class="coin-icon coin-usdt">T</div>
-            <div class="option-content">
-              <div class="option-title">USDT</div>
-              <div class="option-subtitle">Tether · Widely used in the market</div>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="coin" value="USDC" />
-            <div class="coin-icon coin-usdc">C</div>
-            <div class="option-content">
-              <div class="option-title">USDC</div>
-              <div class="option-subtitle">Circle · Better regulatory profile</div>
-            </div>
-          </label>
-        </div>
-      </div>
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            startTimer(15 * 60);
+            renderChains();
+            updateLabels();
+            // Initial selection UI update
+            selectMethod('card');
+        });
 
-      <div class="card">
-        <div class="card-title-row">
-          <div class="card-title">Network</div>
-          <span class="tag" id="networkTag">Not selected</span>
-        </div>
-        <div class="field">
-          <label>Select the network you are going to use in your wallet</label>
-          <div class="options-grid network-options">
-            <label class="option-card">
-              <input type="radio" name="network" value="Ethereum (ERC20)" />
-              <div class="option-content">
-                <div class="option-title">Ethereum (ERC20)</div>
-                <div class="option-subtitle">Higher fees · Stronger ecosystem</div>
-              </div>
-            </label>
-            <label class="option-card">
-              <input type="radio" name="network" value="TRON (TRC20)" />
-              <div class="option-content">
-                <div class="option-title">TRON (TRC20)</div>
-                <div class="option-subtitle">Lower fees · Very common for USDT</div>
-              </div>
-            </label>
-            <label class="option-card">
-              <input type="radio" name="network" value="BSC (BEP20)" />
-              <div class="option-content">
-                <div class="option-title">BSC (BEP20)</div>
-                <div class="option-subtitle">Low fees · EVM compatible</div>
-              </div>
-            </label>
-            <label class="option-card">
-              <input type="radio" name="network" value="Arbitrum One" />
-              <div class="option-content">
-                <div class="option-title">Arbitrum One</div>
-                <div class="option-subtitle">Ethereum L2 · Lower gas</div>
-              </div>
-            </label>
-          </div>
-          <p class="help-text">
-            The network in your wallet must match this selection. Sending funds on the wrong network may result in permanent loss.
-          </p>
-        </div>
-        <div class="risk-note">
-          Trip.com will never ask you to transfer to a personal wallet or to change the address shown on this page inside your wallet.
-        </div>
-        <label class="checkbox-row">
-          <input type="checkbox" id="riskConfirm" />
-          <span>I understand that crypto transfers are irreversible and the network selection must match my wallet.</span>
-        </label>
-      </div>
+        // --- Method Selection Logic ---
+        function selectMethod(method) {
+            state.method = method;
 
-      <div class="buttons-row">
-        <button type="button" class="primary" id="goToMethodBtn" disabled>
-          Next: choose payment method
-        </button>
-      </div>
-    </section>
+            // 1. UI Visual Toggle
+            const methods = ['card', 'apple', 'crypto'];
+            methods.forEach(m => {
+                const el = document.getElementById(`method-${m}`);
+                const dot = el.querySelector('.selected-dot');
+                if (m === method) {
+                    el.classList.add('method-selected');
+                    el.classList.remove('border-gray-200');
+                    dot.classList.remove('hidden');
+                } else {
+                    el.classList.remove('method-selected');
+                    el.classList.add('border-gray-200');
+                    dot.classList.add('hidden');
+                }
+            });
 
-    <!-- METHOD VIEW: choose how to pay -->
-    <section id="view-method" class="view">
-      <h1 class="page-title">Choose how to pay</h1>
-      <p class="page-subtitle">
-        Stablecoin: <span id="methodSummaryCoin">USDT</span> · Network:
-        <span id="methodSummaryNetwork">Not selected</span>
-      </p>
-
-      <div class="card">
-        <div class="card-title-row">
-          <div class="card-title">Payment method</div>
-        </div>
-        <div class="card-subtitle">
-          After you confirm the network, choose how you want to pay.
-        </div>
-
-        <div class="options-grid" style="margin-top: 6px;">
-          <label class="option-card">
-            <input type="radio" name="method" value="qr" />
-            <div class="option-content">
-              <div class="option-title">Scan QR code</div>
-              <div class="option-subtitle">Generate a deposit address as a QR code and pay from your wallet.</div>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="method" value="address" />
-            <div class="option-content">
-              <div class="option-title">Verify wallet address first</div>
-              <div class="option-subtitle">Check the address format before we show the deposit address.</div>
-            </div>
-          </label>
-        </div>
-
-        <!-- QR MODE -->
-        <div id="qr-section" class="mode-section hidden">
-          <div class="mode-title">Scan and pay</div>
-          <p class="help-text">
-            In your wallet, choose <span id="qrCoinLabel">USDT</span> on
-            <span id="qrNetworkLabel">selected network</span> and scan the code below.
-          </p>
-          <div class="qr-wrapper">
-            <div class="fake-qr" aria-label="Deposit QR code (for demo only)"></div>
-            <div class="code-box" id="depositAddress">
-              Deposit address not configured
-            </div>
-          </div>
-          <p class="help-text" style="margin-top: 6px;">
-            Do not change the destination address or network in your wallet. Always double check the amount and the network before confirming.
-          </p>
-          <div class="buttons-row">
-            <button type="button" class="primary" id="qrPaidBtn">
-              I have completed the transfer
-            </button>
-            <button type="button" class="ghost" id="qrBackBtn">
-              Change payment method
-            </button>
-          </div>
-        </div>
-
-        <!-- ADDRESS MODE -->
-        <div id="address-section" class="mode-section hidden">
-          <div class="mode-title">
-            Verify your wallet address
-            <span class="mode-tag">Identity & refunds</span>
-          </div>
-          <div class="identity-note">
-            <strong>Why we ask for this:</strong>
-            this address is used to confirm that the payment is sent from your own wallet, and if a refund is needed later, we will send funds back to this verified address.
-          </div>
-          <p class="help-text">
-            Enter the wallet address you will use to pay. We will do a basic format check before showing the deposit address.
-          </p>
-          <div class="field" style="margin-top: 4px;">
-            <label for="userWallet">Wallet address for identity & refunds</label>
-            <input type="text" id="userWallet" placeholder="Starts with 0x (EVM) or T (TRON), for example" />
-            <p id="addressValidationMessage" class="validation-message"></p>
-          </div>
-          <div class="buttons-row" style="margin-top: 4px;">
-            <button type="button" class="primary" id="validateAddressBtn">
-              Verify address
-            </button>
-          </div>
-          <div id="depositInfoAfterValidation" class="hidden" style="margin-top: 8px;">
-            <div class="field">
-              <label>Deposit address</label>
-              <div class="code-box" id="depositAddress2">
-                Deposit address not configured
-              </div>
-            </div>
-            <p class="help-text" style="margin-top: 4px;">
-              Make sure you send from the wallet address you just verified, on the selected network.
-            </p>
-            <div class="buttons-row" style="margin-top: 6px;">
-              <button type="button" class="primary" id="addressPaidBtn">
-                I have completed the transfer
-              </button>
-              <button type="button" class="ghost" id="addressBackBtn">
-                Change payment method
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="buttons-row" style="margin-top: 10px;">
-        <button type="button" class="ghost" id="methodBackBtn">
-          Back
-        </button>
-      </div>
-    </section>
-
-    <!-- WAITING VIEW -->
-    <section id="view-waiting" class="view">
-      <div class="card">
-        <div class="waiting-layout">
-          <div class="spinner"></div>
-          <p class="timeline" id="confirmationText">
-            Waiting for blockchain confirmations (0 / 3)…
-          </p>
-          <p class="help-text">
-            We have received your transaction and are waiting for confirmations on-chain.
-            In production, Trip.com would query the payment service provider or node to check the status.
-          </p>
-        </div>
-        <div class="buttons-row">
-          <button type="button" class="primary" id="simulateSuccessBtn">
-            Mark as received (demo only)
-          </button>
-          <button type="button" class="ghost" id="waitingBackBtn">
-            Go back to payment methods
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SUCCESS VIEW -->
-    <section id="view-success" class="view">
-      <div class="card">
-        <div class="success-layout">
-          <div class="success-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M9.2 12.5 11 14.3 14.8 9.7" />
-            </svg>
-          </div>
-          <div>
-            <p class="success-title">Payment successful</p>
-            <p class="success-text">
-              Your stablecoin payment has been confirmed on-chain. Trip.com can now continue processing your booking.
-            </p>
-          </div>
-          <div class="success-details">
-            <div class="detail-item">
-              <span class="label">Stablecoin</span>
-              <span class="value" id="summaryCoin">—</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Network</span>
-              <span class="value" id="summaryNetwork">—</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Payment method</span>
-              <span class="value" id="summaryMethod">—</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Wallet address (if provided)</span>
-              <span class="value" id="summaryWallet">—</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Blockchain tx hash (demo)</span>
-              <span class="value" id="summaryTxHash">0x_demo_tx_hash_from_backend</span>
-            </div>
-          </div>
-          <div class="buttons-row" style="margin-top: 8px;">
-            <button type="button" class="primary" id="restartFlow">
-              Start a new payment
-            </button>
-          </div>
-          <p class="tip-banner">
-            Notes: this page is a front-end demo. In production, the merchant backend should:
-            1) generate the order and exact amount; 2) confirm payment with the provider;
-            3) handle timeout, underpayment and duplicate payments safely.
-          </p>
-        </div>
-      </div>
-    </section>
-  </main>
-</div>
-
-<script>
-  (function () {
-    const views = {
-      setup: document.getElementById("view-setup"),
-      method: document.getElementById("view-method"),
-      waiting: document.getElementById("view-waiting"),
-      success: document.getElementById("view-success"),
-    };
-
-    // Setup view elements
-    const networkTag = document.getElementById("networkTag");
-    const networkRadios = document.querySelectorAll('input[name="network"]');
-    const riskConfirm = document.getElementById("riskConfirm");
-    const goToMethodBtn = document.getElementById("goToMethodBtn");
-
-    // Method view elements
-    const methodSummaryCoin = document.getElementById("methodSummaryCoin");
-    const methodSummaryNetwork = document.getElementById("methodSummaryNetwork");
-    const methodBackBtn = document.getElementById("methodBackBtn");
-
-    const qrSection = document.getElementById("qr-section");
-    const addressSection = document.getElementById("address-section");
-    const qrCoinLabel = document.getElementById("qrCoinLabel");
-    const qrNetworkLabel = document.getElementById("qrNetworkLabel");
-    const depositAddressSpan = document.getElementById("depositAddress");
-    const depositAddressSpan2 = document.getElementById("depositAddress2");
-
-    const qrPaidBtn = document.getElementById("qrPaidBtn");
-    const qrBackBtn = document.getElementById("qrBackBtn");
-    const addressPaidBtn = document.getElementById("addressPaidBtn");
-    const addressBackBtn = document.getElementById("addressBackBtn");
-
-    const validateAddressBtn = document.getElementById("validateAddressBtn");
-    const userWalletInput = document.getElementById("userWallet");
-    const addressValidationMessage = document.getElementById("addressValidationMessage");
-    const depositInfoAfterValidation = document.getElementById("depositInfoAfterValidation");
-
-    // Waiting & success view elements
-    const confirmationText = document.getElementById("confirmationText");
-    const simulateSuccessBtn = document.getElementById("simulateSuccessBtn");
-    const waitingBackBtn = document.getElementById("waitingBackBtn");
-    const restartFlowBtn = document.getElementById("restartFlow");
-
-    const summaryCoin = document.getElementById("summaryCoin");
-    const summaryNetwork = document.getElementById("summaryNetwork");
-    const summaryMethod = document.getElementById("summaryMethod");
-    const summaryWallet = document.getElementById("summaryWallet");
-
-    const DEPOSIT_ADDRESSES = {
-      "USDT|Ethereum (ERC20)": "0x1111111111111111111111111111111111111111",
-      "USDT|TRON (TRC20)": "TUSDTTRC20ADDRESSDEMO123456789",
-      "USDT|BSC (BEP20)": "0x2222222222222222222222222222222222222222",
-      "USDT|Arbitrum One": "0x3333333333333333333333333333333333333333",
-      "USDC|Ethereum (ERC20)": "0x4444444444444444444444444444444444444444",
-      "USDC|TRON (TRC20)": "TUSDCTRC20ADDRESSDEMO123456789",
-      "USDC|BSC (BEP20)": "0x5555555555555555555555555555555555555555",
-      "USDC|Arbitrum One": "0x6666666666666666666666666666666666666666",
-    };
-
-    let selectedCoin = "USDT";
-    let selectedNetwork = "";
-    let selectedMethod = null;
-    let userWalletAddress = null;
-    let waitingInterval = null;
-    let confirmations = 0;
-
-    function getSelectedCoin() {
-      const radio = document.querySelector('input[name="coin"]:checked');
-      return radio ? radio.value : null;
-    }
-
-    function getSelectedMethod() {
-      const radio = document.querySelector('input[name="method"]:checked');
-      return radio ? radio.value : null;
-    }
-
-    function getSelectedNetwork() {
-      const radio = document.querySelector('input[name="network"]:checked');
-      return radio ? radio.value : "";
-    }
-
-    function computeDepositAddress() {
-      if (!selectedCoin || !selectedNetwork) {
-        return "Deposit address not configured";
-      }
-      const key = selectedCoin + "|" + selectedNetwork;
-      return DEPOSIT_ADDRESSES[key] || "Deposit address not configured";
-    }
-
-    function updateDepositInfo() {
-      const addr = computeDepositAddress();
-      depositAddressSpan.textContent = addr;
-      depositAddressSpan2.textContent = addr;
-      qrCoinLabel.textContent = selectedCoin || "USDT";
-      qrNetworkLabel.textContent = selectedNetwork || "selected network";
-    }
-
-    function updateMethodHeader() {
-      if (methodSummaryCoin) methodSummaryCoin.textContent = selectedCoin || "—";
-      if (methodSummaryNetwork) methodSummaryNetwork.textContent = selectedNetwork || "Not selected";
-    }
-
-    function hideModeSections() {
-      qrSection.classList.add("hidden");
-      addressSection.classList.add("hidden");
-      const methodRadio = document.querySelectorAll('input[name="method"]');
-      methodRadio.forEach(function (r) { r.checked = false; });
-    }
-
-    function showView(name) {
-      Object.keys(views).forEach(function (key) {
-        views[key].classList.toggle("active", key === name);
-      });
-
-      if (name === "waiting") {
-        startWaiting();
-      } else {
-        stopWaiting();
-      }
-    }
-
-    function startWaiting() {
-      confirmations = 0;
-      confirmationText.textContent = "Waiting for blockchain confirmations (0 / 3)…";
-      if (waitingInterval) {
-        clearInterval(waitingInterval);
-      }
-      waitingInterval = setInterval(function () {
-        confirmations += 1;
-        if (confirmations < 3) {
-          confirmationText.textContent =
-            "Waiting for blockchain confirmations (" + confirmations + " / 3)…";
-        } else {
-          clearInterval(waitingInterval);
-          waitingInterval = null;
-          confirmationText.textContent =
-            "Confirmations completed (3 / 3). Redirecting to success…";
-          setTimeout(function () {
-            showView("success");
-          }, 1200);
+            // 2. Button Logic Update
+            const btn = document.getElementById('main-action-btn');
+            if (method === 'crypto') {
+                btn.innerHTML = 'Next <i class="fa-solid fa-arrow-right text-sm"></i>';
+                btn.classList.add('bg-trip-blue');
+                btn.classList.remove('bg-black');
+            } else if (method === 'apple') {
+                btn.innerText = 'Pay $1,248.50 with Apple Pay';
+                btn.classList.remove('bg-trip-blue');
+                btn.classList.add('bg-black');
+            } else {
+                btn.innerText = 'Pay $1,248.50';
+                btn.classList.add('bg-trip-blue');
+                btn.classList.remove('bg-black');
+            }
         }
-      }, 1600);
-    }
 
-    function stopWaiting() {
-      if (waitingInterval) {
-        clearInterval(waitingInterval);
-        waitingInterval = null;
-      }
-    }
-
-    function updateSuccessSummary(methodLabel) {
-      summaryCoin.textContent = selectedCoin || "—";
-      summaryNetwork.textContent = selectedNetwork || "—";
-      summaryMethod.textContent = methodLabel || "—";
-      summaryWallet.textContent = userWalletAddress || "—";
-    }
-
-    function isValidWallet(addr, network) {
-      if (!addr) return false;
-      var value = addr.trim();
-      if (!value) return false;
-
-      if (network && network.indexOf("TRC20") !== -1) {
-        if (/^T[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(value)) return true;
-        return value.length >= 30 && value.charAt(0) === "T";
-      }
-
-      if (
-        network && (
-          network.indexOf("Ethereum") !== -1 ||
-          network.indexOf("BSC") !== -1 ||
-          network.indexOf("Arbitrum") !== -1
-        )
-      ) {
-        if (/^0x[a-fA-F0-9]{10,}$/.test(value)) return true;
-        return value.indexOf("0x") === 0 && value.length >= 20;
-      }
-
-      return value.length >= 10;
-    }
-
-    function updateNextButtonState() {
-      const ready = Boolean(selectedNetwork) && riskConfirm.checked;
-      if (goToMethodBtn) {
-        goToMethodBtn.disabled = !ready;
-      }
-    }
-
-    // Coin selection
-    document.querySelectorAll('input[name="coin"]').forEach(function (radio) {
-      radio.addEventListener("change", function () {
-        selectedCoin = getSelectedCoin() || "USDT";
-        updateDepositInfo();
-        updateMethodHeader();
-      });
-    });
-
-    // Network selection (flat options)
-    networkRadios.forEach(function (radio) {
-      radio.addEventListener("change", function () {
-        selectedNetwork = getSelectedNetwork() || "";
-        networkTag.textContent = selectedNetwork || "Not selected";
-        updateDepositInfo();
-        updateMethodHeader();
-        updateNextButtonState();
-      });
-    });
-
-    // Risk confirm
-    riskConfirm.addEventListener("change", function () {
-      updateNextButtonState();
-    });
-
-    // Go to method view
-    goToMethodBtn.addEventListener("click", function () {
-      if (!selectedNetwork || !riskConfirm.checked) {
-        return;
-      }
-      updateDepositInfo();
-      updateMethodHeader();
-      hideModeSections();
-      showView("method");
-    });
-
-    // Back from method to setup
-    methodBackBtn.addEventListener("click", function () {
-      showView("setup");
-    });
-
-    // Payment method selection
-    document.querySelectorAll('input[name="method"]').forEach(function (radio) {
-      radio.addEventListener("change", function () {
-        selectedMethod = getSelectedMethod();
-        updateDepositInfo();
-        if (selectedMethod === "qr") {
-          qrSection.classList.remove("hidden");
-          addressSection.classList.add("hidden");
-        } else if (selectedMethod === "address") {
-          addressSection.classList.remove("hidden");
-          qrSection.classList.add("hidden");
-        } else {
-          hideModeSections();
+        function handleMainAction() {
+            if (state.method === 'crypto') {
+                goToStep(2);
+            } else {
+                // Direct Payment Simulation for Card/Apple
+                simulatePayment(true); 
+            }
         }
-      });
-    });
 
-    // QR path
-    qrPaidBtn.addEventListener("click", function () {
-      if (!selectedCoin || !selectedNetwork || !selectedMethod) {
-        alert("Please select stablecoin, network and payment method first.");
-        return;
-      }
-      userWalletAddress = null;
-      updateSuccessSummary("Scan QR code");
-      showView("waiting");
-    });
+        // --- Navigation Logic ---
+        function goToStep(step) {
+            const s1 = document.getElementById('step-1');
+            const s2 = document.getElementById('step-2');
+            const title = document.getElementById('header-title');
+            
+            state.step = step;
 
-    qrBackBtn.addEventListener("click", function () {
-      hideModeSections();
-      selectedMethod = null;
-    });
+            if (step === 1) {
+                s1.classList.remove('step-prev');
+                s1.classList.add('step-active');
+                s2.classList.remove('step-active');
+                s2.classList.add('step-next');
+                title.innerText = 'Checkout';
+            } else {
+                s1.classList.remove('step-active');
+                s1.classList.add('step-prev');
+                s2.classList.remove('step-next');
+                s2.classList.add('step-active');
+                title.innerText = 'Crypto Payment';
+                updateAddress();
+            }
+        }
 
-    // Address path: validate
-    validateAddressBtn.addEventListener("click", function () {
-      const addr = userWalletInput.value.trim();
-      const net = selectedNetwork;
-      if (!net) {
-        addressValidationMessage.textContent = "Please select a network first.";
-        addressValidationMessage.className = "validation-message error";
-        depositInfoAfterValidation.classList.add("hidden");
-        return;
-      }
-      if (!isValidWallet(addr, net)) {
-        addressValidationMessage.textContent =
-          "This wallet address format does not look correct for the selected network.";
-        addressValidationMessage.className = "validation-message error";
-        depositInfoAfterValidation.classList.add("hidden");
-        return;
-      }
-      userWalletAddress = addr;
-      addressValidationMessage.textContent =
-        "Address looks valid. Please complete the transfer from this wallet.";
-      addressValidationMessage.className = "validation-message success";
-      updateDepositInfo();
-      depositInfoAfterValidation.classList.remove("hidden");
-    });
+        function handleBack() {
+            if (state.step === 2) {
+                goToStep(1);
+            } else {
+                alert("Back to Merchant App");
+            }
+        }
 
-    // Address path: paid
-    addressPaidBtn.addEventListener("click", function () {
-      if (!userWalletAddress) {
-        alert("Please verify your wallet address first.");
-        return;
-      }
-      updateSuccessSummary("Verify wallet address first");
-      showView("waiting");
-    });
+        // --- Crypto Logic ---
+        function selectCoin(e, coin) {
+            e.stopPropagation();
+            state.coin = coin;
+            const defaultChain = config[coin].chains[0];
+            state.chain = defaultChain.name;
+            state.address = defaultChain.address;
+            
+            // Update UI Buttons
+            document.getElementById('btn-usdt').className = coin === 'USDT' 
+                ? "flex-1 py-2 rounded-md text-xs font-bold shadow-sm bg-white text-blue-600 transition-all flex items-center justify-center gap-1"
+                : "flex-1 py-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all flex items-center justify-center gap-1";
+                
+            document.getElementById('btn-usdc').className = coin === 'USDC'
+                ? "flex-1 py-2 rounded-md text-xs font-bold shadow-sm bg-white text-blue-600 transition-all flex items-center justify-center gap-1"
+                : "flex-1 py-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all flex items-center justify-center gap-1";
 
-    addressBackBtn.addEventListener("click", function () {
-      hideModeSections();
-      selectedMethod = null;
-      depositInfoAfterValidation.classList.add("hidden");
-      addressValidationMessage.textContent = "";
-      addressValidationMessage.className = "validation-message";
-      userWalletInput.value = "";
-      userWalletAddress = null;
-    });
+            renderChains();
+            updateLabels();
+        }
 
-    // Waiting view actions
-    waitingBackBtn.addEventListener("click", function () {
-      showView("method");
-    });
+        function selectChain(e, chainName) {
+            e.stopPropagation();
+            state.chain = chainName;
+            state.address = config[state.coin].chains.find(c => c.name === chainName).address;
+            renderChains();
+            updateLabels();
+        }
 
-    simulateSuccessBtn.addEventListener("click", function () {
-      stopWaiting();
-      showView("success");
-    });
+        function renderChains() {
+            const container = document.getElementById('chain-container');
+            container.innerHTML = '';
 
-    // Restart
-    restartFlowBtn.addEventListener("click", function () {
-      stopWaiting();
+            config[state.coin].chains.forEach(item => {
+                const btn = document.createElement('div');
+                const isSelected = state.chain === item.name;
+                
+                btn.onclick = (e) => selectChain(e, item.name);
+                
+                btn.className = `relative cursor-pointer rounded-lg p-2 border transition-all flex items-center justify-between ${
+                    isSelected 
+                    ? 'border-trip-blue bg-blue-50 ring-1 ring-blue-100' 
+                    : 'border-gray-200 bg-white hover:bg-gray-50'
+                }`;
 
-      // Reset coin
-      const usdtRadio = document.querySelector('input[name="coin"][value="USDT"]');
-      if (usdtRadio) usdtRadio.checked = true;
-      selectedCoin = "USDT";
+                let badge = item.recommended 
+                    ? `<span class="bg-red-500 text-white text-[8px] font-bold px-1 py-0.5 rounded ml-1">BEST</span>` 
+                    : '';
 
-      // Reset network
-      networkRadios.forEach(function (radio) {
-        radio.checked = false;
-      });
-      selectedNetwork = "";
-      networkTag.textContent = "Not selected";
+                btn.innerHTML = `
+                    <div class="flex items-center w-full overflow-hidden">
+                        <div class="w-3 h-3 rounded-full border border-gray-300 flex items-center justify-center mr-2 shrink-0 ${isSelected ? 'border-blue-500 bg-blue-500' : ''}">
+                            ${isSelected ? '<div class="w-1 h-1 bg-white rounded-full"></div>' : ''}
+                        </div>
+                        <div class="truncate">
+                            <div class="flex items-center">
+                                <span class="text-xs font-bold text-gray-800 truncate">${item.name}</span>
+                                ${badge}
+                            </div>
+                            <div class="text-[9px] text-gray-400 truncate">${item.fee}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(btn);
+            });
+        }
 
-      // Reset risk & methods
-      riskConfirm.checked = false;
-      hideModeSections();
-      selectedMethod = null;
+        // --- Shared Logic ---
+        function setPaymentMode(mode) {
+            state.mode = mode;
+            const scanTab = document.getElementById('tab-scan');
+            const manualTab = document.getElementById('tab-manual');
+            const scanView = document.getElementById('view-scan');
+            const manualView = document.getElementById('view-manual');
 
-      // Reset wallet
-      userWalletInput.value = "";
-      userWalletAddress = null;
-      addressValidationMessage.textContent = "";
-      addressValidationMessage.className = "validation-message";
-      depositInfoAfterValidation.classList.add("hidden");
+            if (mode === 'scan') {
+                scanTab.className = "flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
+                manualTab.className = "flex-1 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-colors";
+                scanView.classList.remove('hidden');
+                manualView.classList.add('hidden');
+            } else {
+                scanTab.className = "flex-1 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-colors";
+                manualTab.className = "flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
+                scanView.classList.add('hidden');
+                manualView.classList.remove('hidden');
+            }
+        }
 
-      updateDepositInfo();
-      updateMethodHeader();
-      updateSuccessSummary("");
-      updateNextButtonState();
-      showView("setup");
-    });
+        function verifyWallet() {
+            const input = document.getElementById('user-wallet-input');
+            const btn = document.getElementById('verify-btn');
+            if (input.value.length < 5) { showToast('Invalid address'); return; }
+            const oldText = btn.innerText;
+            btn.innerText = 'Verifying...';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.innerText = oldText;
+                btn.disabled = false;
+                state.walletVerified = true;
+                document.getElementById('manual-step-1').classList.add('hidden');
+                document.getElementById('manual-step-2').classList.remove('hidden');
+                document.getElementById('manual-step-2').classList.add('fade-in');
+            }, 1000);
+        }
 
-    // Initial state
-    selectedCoin = getSelectedCoin() || "USDT";
-    selectedNetwork = getSelectedNetwork() || "";
-    updateDepositInfo();
-    updateMethodHeader();
-    updateNextButtonState();
-  })();
-</script>
+        function updateLabels() {
+            const els = {
+                'warn-coin': state.coin,
+                'warn-chain': state.chain,
+                'summary-chain': state.chain,
+                'scan-address-text': state.address,
+                'deposit-address': state.address
+            };
+            for (const [id, val] of Object.entries(els)) {
+                const el = document.getElementById(id);
+                if(el) el.innerText = val;
+            }
+        }
+
+        function updateAddress() {
+            const qrImg = document.getElementById('qr-image');
+            const loader = document.getElementById('qr-loader');
+            loader.classList.remove('hidden');
+            setTimeout(() => {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${state.address}`;
+                qrImg.onload = () => loader.classList.add('hidden');
+            }, 200);
+            updateLabels();
+        }
+
+        function copyAddress() {
+            navigator.clipboard.writeText(state.address).then(() => showToast('Copied!'));
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('opacity-0', 'top-16');
+            t.classList.add('top-20');
+            setTimeout(() => { t.classList.add('opacity-0', 'top-16'); t.classList.remove('top-20'); }, 2000);
+        }
+
+        function simulatePayment(instant = false) {
+            // Case 1: Manual Crypto Check
+            if (!instant && state.mode === 'manual' && !state.walletVerified) {
+                showToast('Verify wallet first');
+                return;
+            }
+
+            // Case 2: Crypto Payment -> Show Pending Info first
+            if (state.method === 'crypto' && !instant) {
+                const pendingOverlay = document.getElementById('payment-pending-info');
+                pendingOverlay.classList.remove('hidden');
+                
+                // Simulate wait time (e.g. 4 seconds) then show success
+                setTimeout(() => {
+                    pendingOverlay.classList.add('hidden');
+                    document.getElementById('payment-success').classList.remove('hidden');
+                }, 4000);
+                return;
+            }
+
+            // Case 3: Card/Apple Instant Payment
+            const processing = document.getElementById('payment-processing');
+            processing.classList.remove('hidden');
+            setTimeout(() => {
+                processing.classList.add('hidden');
+                document.getElementById('payment-success').classList.remove('hidden');
+            }, 2000);
+        }
+
+        function startTimer(duration) {
+            let timer = duration;
+            const displays = document.querySelectorAll('.timer-display');
+            setInterval(() => {
+                let m = parseInt(timer / 60, 10);
+                let s = parseInt(timer % 60, 10);
+                m = m < 10 ? "0" + m : m;
+                s = s < 10 ? "0" + s : s;
+                displays.forEach(d => d.innerText = m + ":" + s);
+                if (--timer < 0) timer = 0;
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
