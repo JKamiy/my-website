@@ -2,244 +2,1221 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>TripGenie · Disney Ticket</title>
+  <title>Trip.com · Stablecoin Payment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <style>
     :root {
-      --bg: #f4f6f8;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #6b7280;
-      --primary: #2563eb;
-      --border: #e5e7eb;
-      --chip: #eef2ff;
+      --bg-page: #f3f4f6;
+      --bg-card: #f9fafb;
+      --border-subtle: #e5e7eb;
+      --border-strong: #d1d5db;
+      --primary: #0086ff;
+      --primary-soft: rgba(0, 134, 255, 0.08);
+      --primary-soft-strong: rgba(0, 134, 255, 0.12);
+      --danger: #ef4444;
+      --success: #16a34a;
+      --text-main: #111827;
+      --text-subtle: #6b7280;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-main: 0 12px 30px rgba(15,23,42,0.16);
+      --transition-fast: 0.16s ease-out;
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    html, body { margin: 0; padding: 0; overflow-x: hidden; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    /* Responsive app that fills the viewport; no horizontal scroll */
-    .app {
-      width: 100vw;
-      height: 100dvh;          /* dynamic viewport on iOS; avoids URL bar issues */
-      height: 100svh;          /* fallback for older iOS */
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-page);
+      color: var(--text-main);
       display: flex;
-      flex-direction: column;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-      overflow-y: auto;        /* vertical scroll allowed if content grows */
-      overflow-x: hidden;      /* enforce no horizontal scroll */
+      align-items: flex-start;
+      justify-content: center;
+      padding: 16px 12px;
     }
 
-    /* Top-level sections */
-    .topbar {
-      background: var(--card);
-      padding: 14px 16px;
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid rgba(15,23,42,0.06);
+      box-shadow: var(--shadow-main);
+      padding: 14px 14px 18px;
+    }
+
+    .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      flex: 0 0 auto;
+      gap: 8px;
+      margin-bottom: 10px;
     }
-    .logo { font-weight: 800; letter-spacing: .2px; }
-    .logo .dot { color: #2563eb; }
-    .status { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      padding: 14px 12px 2px;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      flex: 0 0 auto;
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      font-size: 16px;
+      color: var(--primary);
     }
-    @media (max-width: 480px) {
-      .grid { grid-template-columns: repeat(5, minmax(0,1fr)); }
-      .icon span { font-size: 11px; }
-    }
-    .icon { text-align: center; padding: 6px 0 10px; }
-    .icon .glyph { font-size: 22px; display: block; }
-    .icon span { font-size: 12px; color: var(--text); word-break: keep-all; }
 
-    .chat {
-      padding: 12px;
+    .logo span {
+      color: #111827;
+      font-weight: 500;
+    }
+
+    .top-status {
+      font-size: 11px;
+      color: var(--text-subtle);
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .top-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .page-title {
+      margin: 0 0 2px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .page-subtitle {
+      margin: 0 0 12px;
+      font-size: 12px;
+      color: var(--text-subtle);
+    }
+
+    main {
+      font-size: 13px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 10px 9px;
+      margin-bottom: 10px;
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .amount-main {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .amount-sub {
+      font-size: 11px;
+      color: var(--text-subtle);
+      margin-top: 2px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-subtle);
+      background: #ffffff;
+      white-space: nowrap;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--text-subtle);
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .option-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .option-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 6px 16px rgba(15,23,42,0.1);
+      transform: translateY(-0.5px);
+    }
+
+    .option-card input[type="radio"] {
+      accent-color: var(--primary);
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    .option-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .option-title {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .option-subtitle {
+      font-size: 11px;
+      color: var(--text-subtle);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .option-card input[type="radio"]:checked ~ .option-content {
+      border-radius: 999px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      background: var(--primary-soft);
+      box-shadow: 0 0 0 1px rgba(0,134,255,0.75);
+    }
+
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      appearance: none;
+    }
+
+    select:focus,
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(0,134,255,0.8);
+      background: #ffffff;
+    }
+
+    .help-text {
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .risk-note {
+      margin-top: 6px;
+      padding: 7px 8px;
+      border-radius: 11px;
+      background: #ffffff;
+      border: 1px dashed var(--border-strong);
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      margin-top: 2px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .mode-section {
+      margin-top: 8px;
+      border-radius: 12px;
+      border: 1px dashed var(--border-strong);
+      padding: 8px 8px 9px;
+      background: #ffffff;
+    }
+
+    .mode-title {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .qr-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fake-qr {
+      width: 164px;
+      height: 164px;
+      border-radius: 18px;
+      background:
+        repeating-linear-gradient(45deg, #111827 0, #111827 5px, #e5e7eb 5px, #e5e7eb 10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fake-qr::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 12px;
+      background:
+        repeating-linear-gradient(135deg, #111827 0, #111827 3px, #f9fafb 3px, #f9fafb 6px);
+      mix-blend-mode: multiply;
+      opacity: 0.9;
+    }
+
+    .code-box {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      padding: 7px 8px;
+      border-radius: 11px;
+      background: #f3f4f6;
+      border: 1px solid var(--border-strong);
+      word-break: break-all;
+    }
+
+    .buttons-row {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: stretch;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 999px;
+      padding: 9px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
+      user-select: none;
+      width: 100%;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #0094ff, #006dff);
+      color: #ffffff;
+      box-shadow:
+        0 10px 18px rgba(0,109,255,0.25);
+    }
+
+    button.primary:hover {
+      box-shadow:
+        0 14px 26px rgba(0,109,255,0.3);
+      transform: translateY(-0.5px);
+    }
+
+    button.ghost {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+    }
+
+    button.ghost:hover {
+      background: #f3f4f6;
+    }
+
+    button[disabled] {
+      opacity: 0.45;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .validation-message {
+      margin-top: 3px;
+      font-size: 11px;
+    }
+
+    .validation-message.error {
+      color: var(--danger);
+    }
+
+    .validation-message.success {
+      color: var(--success);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .waiting-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 3px solid #e5e7eb;
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .timeline {
+      font-size: 12px;
+      color: var(--text-subtle);
+    }
+
+    .success-layout {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      flex: 1 1 auto;
-      min-height: 0; /* allow flex child to shrink without causing overflow-x */
+      align-items: center;
+      text-align: center;
     }
-    .assistant-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
-    .assistant-head { display:flex; align-items:center; justify-content: space-between; }
-    .agent { display:flex; align-items:center; gap:8px; font-weight:600; }
-    .avatar { width:22px; height:22px; border-radius:50%; background:#e0e7ff; display:grid; place-items:center; font-size:14px; }
-    .hint { color: var(--muted); text-align:center; font-size:12px; margin: 14px 0; }
 
-    .user-bubble { align-self: center; background:#334155; color:#fff; padding: 10px 14px; border-radius: 999px; font-weight:600; max-width: 90%; }
+    .success-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 25% 20%, #bbf7d0, #22c55e 40%, #16a34a 70%, #052e16 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 12px 24px rgba(16,185,129,0.35);
+    }
 
-    .answer { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .success-icon svg {
+      width: 30px;
+      height: 30px;
+      fill: none;
+      stroke: white;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-    .order-card { margin-top: 12px; border: 1px dashed var(--border); border-radius: 12px; background: #fcfcff; padding: 12px; }
-    .order-title { font-weight: 700; display:flex; align-items:center; gap:8px; }
-    .badge { background:#ecfeff; border:1px solid #cffafe; color:#0ea5e9; padding:2px 8px; border-radius:999px; font-size:12px; }
-    .order-grid { display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin:10px 0; font-size:14px; }
-    @media (max-width: 480px) { .order-grid { grid-template-columns: 1fr; } }
-    .order-grid div { background:#fff; border:1px solid var(--border); border-radius:8px; padding:8px; }
-    .price-row { display:flex; align-items:center; justify-content:space-between; margin-top:6px; font-weight:700; }
-    .actions { display:flex; gap:8px; margin-top:10px; flex-wrap: wrap; }
-    .btn { appearance:none; border:1px solid var(--border); background:#fff; border-radius:999px; padding:10px 14px; cursor:pointer; font-weight:600; }
-    .btn-primary { background: var(--primary); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(37,99,235,.25); }
+    .success-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0;
+    }
 
-    .tools { display:flex; gap:10px; margin-top:10px; }
-    .tool-btn { flex:1; background: var(--card); border:1px solid var(--border); padding: 10px 12px; border-radius: 10px; font-weight:600; cursor:pointer; }
+    .success-text {
+      font-size: 12px;
+      color: var(--text-subtle);
+      margin: 0;
+    }
 
-    .composer { position: sticky; bottom: 0; background: var(--card); border-top:1px solid var(--border); padding: 10px; display:flex; gap:8px; }
-    .composer input { flex:1; border:1px solid var(--border); border-radius:999px; padding:10px 14px; font-size:14px; }
-    .send { border:0; background: var(--primary); color:#fff; border-radius:999px; padding: 0 14px; font-weight:700; cursor:pointer; }
+    .success-details {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      font-size: 11px;
+      margin-top: 6px;
+    }
 
-    /* Test runner styles */
-    .tests { margin: 10px 12px 0; background: #fff; border:1px solid var(--border); border-radius: 12px; padding: 12px; }
-    .tests h4 { margin: 0 0 8px; }
-    .test-result { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; margin: 4px 0; }
-    .pass { color: #16a34a; }
-    .fail { color: #dc2626; }
+    .detail-item {
+      text-align: left;
+    }
+
+    .detail-item span.label {
+      display: block;
+      color: var(--text-subtle);
+      margin-bottom: 1px;
+    }
+
+    .detail-item span.value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      word-break: break-all;
+    }
+
+    .tip-banner {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .coin-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 8px rgba(15,23,42,0.22);
+    }
+
+    .coin-usdt {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+    }
+
+    .coin-usdc {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .mode-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid rgba(0,134,255,0.3);
+      flex-shrink: 0;
+    }
+
+    .identity-note {
+      margin-top: 4px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(0,134,255,0.06);
+      border: 1px dashed rgba(0,134,255,0.35);
+      font-size: 11px;
+      color: var(--text-main);
+    }
+
+    .identity-note strong {
+      font-weight: 600;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
-  <main class="app" id="app" role="main" aria-label="TripGenie responsive app">
-    <header class="topbar">
-      <div class="logo">Trip<span class="dot">.</span>com</div>
-      <div class="status">Silver · <span aria-hidden>🔔</span></div>
-    </header>
+<div class="container">
+  <header class="top-bar">
+    <div class="logo">Trip<span>.com</span></div>
+    <div class="top-status">
+      <span class="top-dot"></span>
+      Secure payment
+    </div>
+  </header>
 
-    <section class="grid" aria-label="Quick links">
-      <div class="icon"><span class="glyph">🏨</span><span>Hotels</span></div>
-      <div class="icon"><span class="glyph">✈️</span><span>Flights</span></div>
-      <div class="icon"><span class="glyph">🧳</span><span>Flight + Hotel</span></div>
-      <div class="icon"><span class="glyph">🚆</span><span>Trains</span></div>
-      <div class="icon"><span class="glyph">➕</span><span>More</span></div>
-    </section>
+  <main>
+    <!-- SETUP VIEW: coin + network -->
+    <section id="view-setup" class="view active">
+      <h1 class="page-title">Pay with stablecoin</h1>
+      <p class="page-subtitle">
+        Select currency and network first. On-chain transfers are final and cannot be reversed.
+      </p>
 
-    <section class="chat" aria-label="Conversation">
-      <div class="assistant-card">
-        <div class="assistant-head">
-          <div class="agent"><span class="avatar">🤖</span>TripGenie</div>
-          <div style="color:var(--muted); font-size:14px;">🔇</div>
-        </div>
-        <p class="hint">Scroll down to see the history</p>
-        <div class="user-bubble">I want to buy the Disney ticket</div>
-
-        <article class="answer" id="answerBlock">
-          <!-- Order card with a working Pay Now button -->
-          <div class="order-card" aria-label="Disney ticket order">
-            <div class="order-title">Disney Ticket Order <span class="badge">Pending</span></div>
-            <div class="order-grid">
-              <div><strong>Park</strong><br/>Disneyland Park · California</div>
-              <div><strong>Date</strong><br/>2025-06-18</div>
-              <div><strong>Ticket Type</strong><br/>1-Day 1-Park</div>
-              <div><strong>Guests</strong><br/>2</div>
-              <div><strong>Order ID</strong><br/>TG123456789</div>
-              <div><strong>Payment Methods</strong><br/>Apple Pay / Card</div>
-            </div>
-            <div class="price-row">
-              <div>Amount Due</div>
-              <div>USD <span style="font-size:18px;">218.00</span></div>
-            </div>
-            <div class="actions">
-              <button class="btn" id="viewOrder">View Order</button>
-              <button class="btn btn-primary" id="payNow" data-paylink="https://pay.example.com/checkout?orderId=TG123456789&amount=21800&currency=USD">Pay Now</button>
-            </div>
+      <div class="card">
+        <div class="card-title-row">
+          <div>
+            <div class="card-title">Order summary</div>
+            <div class="card-subtitle" id="orderMeta">Hotel booking · Demo only</div>
           </div>
-        </article>
-
-        <div class="tools">
-          <button class="tool-btn">Compare hotels</button>
-          <button class="tool-btn">Recognize image</button>
-          <button class="tool-btn">Live translate</button>
+          <div class="amount-main" id="orderAmount">$120.00</div>
         </div>
+        <div class="amount-sub">Exact amount and currency should be provided by backend.</div>
+      </div>
 
-        <!-- Minimal test runner -->
-        <div class="tests" id="tests">
-          <h4>Self Tests</h4>
-          <div id="test-results"></div>
-          <button class="btn" id="run-tests">Run Tests</button>
+      <div class="card">
+        <div class="card-title-row">
+          <div class="card-title">Stablecoin</div>
+          <span class="tag">USDT / USDC</span>
+        </div>
+        <div class="card-subtitle">Choose which stablecoin you want to use.</div>
+        <div class="options-grid">
+          <label class="option-card">
+            <input type="radio" name="coin" value="USDT" checked />
+            <div class="coin-icon coin-usdt">T</div>
+            <div class="option-content">
+              <div class="option-title">USDT</div>
+              <div class="option-subtitle">Tether · Widely used in the market</div>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="coin" value="USDC" />
+            <div class="coin-icon coin-usdc">C</div>
+            <div class="option-content">
+              <div class="option-title">USDC</div>
+              <div class="option-subtitle">Circle · Better regulatory profile</div>
+            </div>
+          </label>
         </div>
       </div>
 
-      <div class="composer" role="search">
-        <input placeholder="Ask me anything about travel" aria-label="Message input" />
-        <button class="send">➤</button>
+      <div class="card">
+        <div class="card-title-row">
+          <div class="card-title">Network</div>
+          <span class="tag" id="networkTag">Not selected</span>
+        </div>
+        <div class="field">
+          <label>Select the network you are going to use in your wallet</label>
+          <div class="options-grid network-options">
+            <label class="option-card">
+              <input type="radio" name="network" value="Ethereum (ERC20)" />
+              <div class="option-content">
+                <div class="option-title">Ethereum (ERC20)</div>
+                <div class="option-subtitle">Higher fees · Stronger ecosystem</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="network" value="TRON (TRC20)" />
+              <div class="option-content">
+                <div class="option-title">TRON (TRC20)</div>
+                <div class="option-subtitle">Lower fees · Very common for USDT</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="network" value="BSC (BEP20)" />
+              <div class="option-content">
+                <div class="option-title">BSC (BEP20)</div>
+                <div class="option-subtitle">Low fees · EVM compatible</div>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="network" value="Arbitrum One" />
+              <div class="option-content">
+                <div class="option-title">Arbitrum One</div>
+                <div class="option-subtitle">Ethereum L2 · Lower gas</div>
+              </div>
+            </label>
+          </div>
+          <p class="help-text">
+            The network in your wallet must match this selection. Sending funds on the wrong network may result in permanent loss.
+          </p>
+        </div>
+        <div class="risk-note">
+          Trip.com will never ask you to transfer to a personal wallet or to change the address shown on this page inside your wallet.
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="riskConfirm" />
+          <span>I understand that crypto transfers are irreversible and the network selection must match my wallet.</span>
+        </label>
+      </div>
+
+      <div class="buttons-row">
+        <button type="button" class="primary" id="goToMethodBtn" disabled>
+          Next: choose payment method
+        </button>
+      </div>
+    </section>
+
+    <!-- METHOD VIEW: choose how to pay -->
+    <section id="view-method" class="view">
+      <h1 class="page-title">Choose how to pay</h1>
+      <p class="page-subtitle">
+        Stablecoin: <span id="methodSummaryCoin">USDT</span> · Network:
+        <span id="methodSummaryNetwork">Not selected</span>
+      </p>
+
+      <div class="card">
+        <div class="card-title-row">
+          <div class="card-title">Payment method</div>
+        </div>
+        <div class="card-subtitle">
+          After you confirm the network, choose how you want to pay.
+        </div>
+
+        <div class="options-grid" style="margin-top: 6px;">
+          <label class="option-card">
+            <input type="radio" name="method" value="qr" />
+            <div class="option-content">
+              <div class="option-title">Scan QR code</div>
+              <div class="option-subtitle">Generate a deposit address as a QR code and pay from your wallet.</div>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="method" value="address" />
+            <div class="option-content">
+              <div class="option-title">Verify wallet address first</div>
+              <div class="option-subtitle">Check the address format before we show the deposit address.</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- QR MODE -->
+        <div id="qr-section" class="mode-section hidden">
+          <div class="mode-title">Scan and pay</div>
+          <p class="help-text">
+            In your wallet, choose <span id="qrCoinLabel">USDT</span> on
+            <span id="qrNetworkLabel">selected network</span> and scan the code below.
+          </p>
+          <div class="qr-wrapper">
+            <div class="fake-qr" aria-label="Deposit QR code (for demo only)"></div>
+            <div class="code-box" id="depositAddress">
+              Deposit address not configured
+            </div>
+          </div>
+          <p class="help-text" style="margin-top: 6px;">
+            Do not change the destination address or network in your wallet. Always double check the amount and the network before confirming.
+          </p>
+          <div class="buttons-row">
+            <button type="button" class="primary" id="qrPaidBtn">
+              I have completed the transfer
+            </button>
+            <button type="button" class="ghost" id="qrBackBtn">
+              Change payment method
+            </button>
+          </div>
+        </div>
+
+        <!-- ADDRESS MODE -->
+        <div id="address-section" class="mode-section hidden">
+          <div class="mode-title">
+            Verify your wallet address
+            <span class="mode-tag">Identity & refunds</span>
+          </div>
+          <div class="identity-note">
+            <strong>Why we ask for this:</strong>
+            this address is used to confirm that the payment is sent from your own wallet, and if a refund is needed later, we will send funds back to this verified address.
+          </div>
+          <p class="help-text">
+            Enter the wallet address you will use to pay. We will do a basic format check before showing the deposit address.
+          </p>
+          <div class="field" style="margin-top: 4px;">
+            <label for="userWallet">Wallet address for identity & refunds</label>
+            <input type="text" id="userWallet" placeholder="Starts with 0x (EVM) or T (TRON), for example" />
+            <p id="addressValidationMessage" class="validation-message"></p>
+          </div>
+          <div class="buttons-row" style="margin-top: 4px;">
+            <button type="button" class="primary" id="validateAddressBtn">
+              Verify address
+            </button>
+          </div>
+          <div id="depositInfoAfterValidation" class="hidden" style="margin-top: 8px;">
+            <div class="field">
+              <label>Deposit address</label>
+              <div class="code-box" id="depositAddress2">
+                Deposit address not configured
+              </div>
+            </div>
+            <p class="help-text" style="margin-top: 4px;">
+              Make sure you send from the wallet address you just verified, on the selected network.
+            </p>
+            <div class="buttons-row" style="margin-top: 6px;">
+              <button type="button" class="primary" id="addressPaidBtn">
+                I have completed the transfer
+              </button>
+              <button type="button" class="ghost" id="addressBackBtn">
+                Change payment method
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons-row" style="margin-top: 10px;">
+        <button type="button" class="ghost" id="methodBackBtn">
+          Back
+        </button>
+      </div>
+    </section>
+
+    <!-- WAITING VIEW -->
+    <section id="view-waiting" class="view">
+      <div class="card">
+        <div class="waiting-layout">
+          <div class="spinner"></div>
+          <p class="timeline" id="confirmationText">
+            Waiting for blockchain confirmations (0 / 3)…
+          </p>
+          <p class="help-text">
+            We have received your transaction and are waiting for confirmations on-chain.
+            In production, Trip.com would query the payment service provider or node to check the status.
+          </p>
+        </div>
+        <div class="buttons-row">
+          <button type="button" class="primary" id="simulateSuccessBtn">
+            Mark as received (demo only)
+          </button>
+          <button type="button" class="ghost" id="waitingBackBtn">
+            Go back to payment methods
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUCCESS VIEW -->
+    <section id="view-success" class="view">
+      <div class="card">
+        <div class="success-layout">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M9.2 12.5 11 14.3 14.8 9.7" />
+            </svg>
+          </div>
+          <div>
+            <p class="success-title">Payment successful</p>
+            <p class="success-text">
+              Your stablecoin payment has been confirmed on-chain. Trip.com can now continue processing your booking.
+            </p>
+          </div>
+          <div class="success-details">
+            <div class="detail-item">
+              <span class="label">Stablecoin</span>
+              <span class="value" id="summaryCoin">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Network</span>
+              <span class="value" id="summaryNetwork">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Payment method</span>
+              <span class="value" id="summaryMethod">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Wallet address (if provided)</span>
+              <span class="value" id="summaryWallet">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Blockchain tx hash (demo)</span>
+              <span class="value" id="summaryTxHash">0x_demo_tx_hash_from_backend</span>
+            </div>
+          </div>
+          <div class="buttons-row" style="margin-top: 8px;">
+            <button type="button" class="primary" id="restartFlow">
+              Start a new payment
+            </button>
+          </div>
+          <p class="tip-banner">
+            Notes: this page is a front-end demo. In production, the merchant backend should:
+            1) generate the order and exact amount; 2) confirm payment with the provider;
+            3) handle timeout, underpayment and duplicate payments safely.
+          </p>
+        </div>
       </div>
     </section>
   </main>
+</div>
 
-  <script>
-    // App interactivity
-    function buildOrderMessage() {
-      return `Order details:\nOrder ID TG123456789\nTicket 1-Day 1-Park\nDate 2025-06-18\nAmount USD 218.00`;
+<script>
+  (function () {
+    const views = {
+      setup: document.getElementById("view-setup"),
+      method: document.getElementById("view-method"),
+      waiting: document.getElementById("view-waiting"),
+      success: document.getElementById("view-success"),
+    };
+
+    // Setup view elements
+    const networkTag = document.getElementById("networkTag");
+    const networkRadios = document.querySelectorAll('input[name="network"]');
+    const riskConfirm = document.getElementById("riskConfirm");
+    const goToMethodBtn = document.getElementById("goToMethodBtn");
+
+    // Method view elements
+    const methodSummaryCoin = document.getElementById("methodSummaryCoin");
+    const methodSummaryNetwork = document.getElementById("methodSummaryNetwork");
+    const methodBackBtn = document.getElementById("methodBackBtn");
+
+    const qrSection = document.getElementById("qr-section");
+    const addressSection = document.getElementById("address-section");
+    const qrCoinLabel = document.getElementById("qrCoinLabel");
+    const qrNetworkLabel = document.getElementById("qrNetworkLabel");
+    const depositAddressSpan = document.getElementById("depositAddress");
+    const depositAddressSpan2 = document.getElementById("depositAddress2");
+
+    const qrPaidBtn = document.getElementById("qrPaidBtn");
+    const qrBackBtn = document.getElementById("qrBackBtn");
+    const addressPaidBtn = document.getElementById("addressPaidBtn");
+    const addressBackBtn = document.getElementById("addressBackBtn");
+
+    const validateAddressBtn = document.getElementById("validateAddressBtn");
+    const userWalletInput = document.getElementById("userWallet");
+    const addressValidationMessage = document.getElementById("addressValidationMessage");
+    const depositInfoAfterValidation = document.getElementById("depositInfoAfterValidation");
+
+    // Waiting & success view elements
+    const confirmationText = document.getElementById("confirmationText");
+    const simulateSuccessBtn = document.getElementById("simulateSuccessBtn");
+    const waitingBackBtn = document.getElementById("waitingBackBtn");
+    const restartFlowBtn = document.getElementById("restartFlow");
+
+    const summaryCoin = document.getElementById("summaryCoin");
+    const summaryNetwork = document.getElementById("summaryNetwork");
+    const summaryMethod = document.getElementById("summaryMethod");
+    const summaryWallet = document.getElementById("summaryWallet");
+
+    const DEPOSIT_ADDRESSES = {
+      "USDT|Ethereum (ERC20)": "0x1111111111111111111111111111111111111111",
+      "USDT|TRON (TRC20)": "TUSDTTRC20ADDRESSDEMO123456789",
+      "USDT|BSC (BEP20)": "0x2222222222222222222222222222222222222222",
+      "USDT|Arbitrum One": "0x3333333333333333333333333333333333333333",
+      "USDC|Ethereum (ERC20)": "0x4444444444444444444444444444444444444444",
+      "USDC|TRON (TRC20)": "TUSDCTRC20ADDRESSDEMO123456789",
+      "USDC|BSC (BEP20)": "0x5555555555555555555555555555555555555555",
+      "USDC|Arbitrum One": "0x6666666666666666666666666666666666666666",
+    };
+
+    let selectedCoin = "USDT";
+    let selectedNetwork = "";
+    let selectedMethod = null;
+    let userWalletAddress = null;
+    let waitingInterval = null;
+    let confirmations = 0;
+
+    function getSelectedCoin() {
+      const radio = document.querySelector('input[name="coin"]:checked');
+      return radio ? radio.value : null;
     }
 
-    const payBtn = document.getElementById('payNow');
-    payBtn?.addEventListener('click', (e) => {
-      const url = e.currentTarget.dataset.paylink;
-      window.open(url, '_blank');
+    function getSelectedMethod() {
+      const radio = document.querySelector('input[name="method"]:checked');
+      return radio ? radio.value : null;
+    }
+
+    function getSelectedNetwork() {
+      const radio = document.querySelector('input[name="network"]:checked');
+      return radio ? radio.value : "";
+    }
+
+    function computeDepositAddress() {
+      if (!selectedCoin || !selectedNetwork) {
+        return "Deposit address not configured";
+      }
+      const key = selectedCoin + "|" + selectedNetwork;
+      return DEPOSIT_ADDRESSES[key] || "Deposit address not configured";
+    }
+
+    function updateDepositInfo() {
+      const addr = computeDepositAddress();
+      depositAddressSpan.textContent = addr;
+      depositAddressSpan2.textContent = addr;
+      qrCoinLabel.textContent = selectedCoin || "USDT";
+      qrNetworkLabel.textContent = selectedNetwork || "selected network";
+    }
+
+    function updateMethodHeader() {
+      if (methodSummaryCoin) methodSummaryCoin.textContent = selectedCoin || "—";
+      if (methodSummaryNetwork) methodSummaryNetwork.textContent = selectedNetwork || "Not selected";
+    }
+
+    function hideModeSections() {
+      qrSection.classList.add("hidden");
+      addressSection.classList.add("hidden");
+      const methodRadio = document.querySelectorAll('input[name="method"]');
+      methodRadio.forEach(function (r) { r.checked = false; });
+    }
+
+    function showView(name) {
+      Object.keys(views).forEach(function (key) {
+        views[key].classList.toggle("active", key === name);
+      });
+
+      if (name === "waiting") {
+        startWaiting();
+      } else {
+        stopWaiting();
+      }
+    }
+
+    function startWaiting() {
+      confirmations = 0;
+      confirmationText.textContent = "Waiting for blockchain confirmations (0 / 3)…";
+      if (waitingInterval) {
+        clearInterval(waitingInterval);
+      }
+      waitingInterval = setInterval(function () {
+        confirmations += 1;
+        if (confirmations < 3) {
+          confirmationText.textContent =
+            "Waiting for blockchain confirmations (" + confirmations + " / 3)…";
+        } else {
+          clearInterval(waitingInterval);
+          waitingInterval = null;
+          confirmationText.textContent =
+            "Confirmations completed (3 / 3). Redirecting to success…";
+          setTimeout(function () {
+            showView("success");
+          }, 1200);
+        }
+      }, 1600);
+    }
+
+    function stopWaiting() {
+      if (waitingInterval) {
+        clearInterval(waitingInterval);
+        waitingInterval = null;
+      }
+    }
+
+    function updateSuccessSummary(methodLabel) {
+      summaryCoin.textContent = selectedCoin || "—";
+      summaryNetwork.textContent = selectedNetwork || "—";
+      summaryMethod.textContent = methodLabel || "—";
+      summaryWallet.textContent = userWalletAddress || "—";
+    }
+
+    function isValidWallet(addr, network) {
+      if (!addr) return false;
+      var value = addr.trim();
+      if (!value) return false;
+
+      if (network && network.indexOf("TRC20") !== -1) {
+        if (/^T[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(value)) return true;
+        return value.length >= 30 && value.charAt(0) === "T";
+      }
+
+      if (
+        network && (
+          network.indexOf("Ethereum") !== -1 ||
+          network.indexOf("BSC") !== -1 ||
+          network.indexOf("Arbitrum") !== -1
+        )
+      ) {
+        if (/^0x[a-fA-F0-9]{10,}$/.test(value)) return true;
+        return value.indexOf("0x") === 0 && value.length >= 20;
+      }
+
+      return value.length >= 10;
+    }
+
+    function updateNextButtonState() {
+      const ready = Boolean(selectedNetwork) && riskConfirm.checked;
+      if (goToMethodBtn) {
+        goToMethodBtn.disabled = !ready;
+      }
+    }
+
+    // Coin selection
+    document.querySelectorAll('input[name="coin"]').forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        selectedCoin = getSelectedCoin() || "USDT";
+        updateDepositInfo();
+        updateMethodHeader();
+      });
     });
 
-    const viewBtn = document.getElementById('viewOrder');
-    viewBtn?.addEventListener('click', () => {
-      alert(buildOrderMessage());
+    // Network selection (flat options)
+    networkRadios.forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        selectedNetwork = getSelectedNetwork() || "";
+        networkTag.textContent = selectedNetwork || "Not selected";
+        updateDepositInfo();
+        updateMethodHeader();
+        updateNextButtonState();
+      });
     });
 
-    // --- Responsive tests (no horizontal scroll; viewport fit) ---
-    function expect(name, condition, info = "") {
-      const row = document.createElement('div');
-      row.className = 'test-result ' + (condition ? 'pass' : 'fail');
-      row.textContent = (condition ? 'PASS' : 'FAIL') + ' — ' + name + (info ? ' (' + info + ')' : '');
-      document.getElementById('test-results').appendChild(row);
-    }
+    // Risk confirm
+    riskConfirm.addEventListener("change", function () {
+      updateNextButtonState();
+    });
 
-    function clearResults(){
-      const c = document.getElementById('test-results');
-      c.innerHTML = '';
-    }
+    // Go to method view
+    goToMethodBtn.addEventListener("click", function () {
+      if (!selectedNetwork || !riskConfirm.checked) {
+        return;
+      }
+      updateDepositInfo();
+      updateMethodHeader();
+      hideModeSections();
+      showView("method");
+    });
 
-    function runTests(){
-      clearResults();
-      const app = document.getElementById('app');
+    // Back from method to setup
+    methodBackBtn.addEventListener("click", function () {
+      showView("setup");
+    });
 
-      // T1: No horizontal scroll on document and app
-      expect('Document: no horizontal scroll', document.documentElement.scrollWidth <= window.innerWidth + 1, document.documentElement.scrollWidth + ' vs ' + window.innerWidth);
-      expect('Body: no horizontal scroll', document.body.scrollWidth <= window.innerWidth + 1, document.body.scrollWidth + ' vs ' + window.innerWidth);
-      expect('App: no horizontal overflow', app.scrollWidth <= app.clientWidth + 1, app.scrollWidth + ' vs ' + app.clientWidth);
+    // Payment method selection
+    document.querySelectorAll('input[name="method"]').forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        selectedMethod = getSelectedMethod();
+        updateDepositInfo();
+        if (selectedMethod === "qr") {
+          qrSection.classList.remove("hidden");
+          addressSection.classList.add("hidden");
+        } else if (selectedMethod === "address") {
+          addressSection.classList.remove("hidden");
+          qrSection.classList.add("hidden");
+        } else {
+          hideModeSections();
+        }
+      });
+    });
 
-      // T2: App width equals viewport width (±1px tolerance)
-      const appRect = app.getBoundingClientRect();
-      expect('App width ~ viewport width', Math.abs(appRect.width - window.innerWidth) <= 1, appRect.width + ' vs ' + window.innerWidth);
+    // QR path
+    qrPaidBtn.addEventListener("click", function () {
+      if (!selectedCoin || !selectedNetwork || !selectedMethod) {
+        alert("Please select stablecoin, network and payment method first.");
+        return;
+      }
+      userWalletAddress = null;
+      updateSuccessSummary("Scan QR code");
+      showView("waiting");
+    });
 
-      // T3: App height equals dynamic viewport height (±3px tolerance)
-      expect('App height ~ viewport height', Math.abs(appRect.height - window.innerHeight) <= 3, appRect.height + ' vs ' + window.innerHeight);
+    qrBackBtn.addEventListener("click", function () {
+      hideModeSections();
+      selectedMethod = null;
+    });
 
-      // T4: Pay Now link present and https
-      const pay = document.getElementById('payNow');
-      expect('Pay Now has data-paylink', !!pay?.dataset?.paylink);
-      expect('Paylink looks like https URL', /^https:\/\//.test(pay?.dataset?.paylink || ''));
+    // Address path: validate
+    validateAddressBtn.addEventListener("click", function () {
+      const addr = userWalletInput.value.trim();
+      const net = selectedNetwork;
+      if (!net) {
+        addressValidationMessage.textContent = "Please select a network first.";
+        addressValidationMessage.className = "validation-message error";
+        depositInfoAfterValidation.classList.add("hidden");
+        return;
+      }
+      if (!isValidWallet(addr, net)) {
+        addressValidationMessage.textContent =
+          "This wallet address format does not look correct for the selected network.";
+        addressValidationMessage.className = "validation-message error";
+        depositInfoAfterValidation.classList.add("hidden");
+        return;
+      }
+      userWalletAddress = addr;
+      addressValidationMessage.textContent =
+        "Address looks valid. Please complete the transfer from this wallet.";
+      addressValidationMessage.className = "validation-message success";
+      updateDepositInfo();
+      depositInfoAfterValidation.classList.remove("hidden");
+    });
 
-      // T5: Order message multi-line and contains ID
-      const msg = buildOrderMessage();
-      expect('Order message has 5 lines', msg.split('\n').length === 5, msg.replace(/\n/g,' | '));
-      expect('Order message mentions Order ID', msg.includes('Order ID TG123456789'));
-    }
+    // Address path: paid
+    addressPaidBtn.addEventListener("click", function () {
+      if (!userWalletAddress) {
+        alert("Please verify your wallet address first.");
+        return;
+      }
+      updateSuccessSummary("Verify wallet address first");
+      showView("waiting");
+    });
 
-    document.getElementById('run-tests')?.addEventListener('click', runTests);
-    window.addEventListener('load', runTests);
-    window.addEventListener('resize', runTests);
-    window.addEventListener('orientationchange', () => setTimeout(runTests, 50));
-  </script>
+    addressBackBtn.addEventListener("click", function () {
+      hideModeSections();
+      selectedMethod = null;
+      depositInfoAfterValidation.classList.add("hidden");
+      addressValidationMessage.textContent = "";
+      addressValidationMessage.className = "validation-message";
+      userWalletInput.value = "";
+      userWalletAddress = null;
+    });
+
+    // Waiting view actions
+    waitingBackBtn.addEventListener("click", function () {
+      showView("method");
+    });
+
+    simulateSuccessBtn.addEventListener("click", function () {
+      stopWaiting();
+      showView("success");
+    });
+
+    // Restart
+    restartFlowBtn.addEventListener("click", function () {
+      stopWaiting();
+
+      // Reset coin
+      const usdtRadio = document.querySelector('input[name="coin"][value="USDT"]');
+      if (usdtRadio) usdtRadio.checked = true;
+      selectedCoin = "USDT";
+
+      // Reset network
+      networkRadios.forEach(function (radio) {
+        radio.checked = false;
+      });
+      selectedNetwork = "";
+      networkTag.textContent = "Not selected";
+
+      // Reset risk & methods
+      riskConfirm.checked = false;
+      hideModeSections();
+      selectedMethod = null;
+
+      // Reset wallet
+      userWalletInput.value = "";
+      userWalletAddress = null;
+      addressValidationMessage.textContent = "";
+      addressValidationMessage.className = "validation-message";
+      depositInfoAfterValidation.classList.add("hidden");
+
+      updateDepositInfo();
+      updateMethodHeader();
+      updateSuccessSummary("");
+      updateNextButtonState();
+      showView("setup");
+    });
+
+    // Initial state
+    selectedCoin = getSelectedCoin() || "USDT";
+    selectedNetwork = getSelectedNetwork() || "";
+    updateDepositInfo();
+    updateMethodHeader();
+    updateNextButtonState();
+  })();
+</script>
 </body>
 </html>
