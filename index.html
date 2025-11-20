@@ -72,6 +72,24 @@
             transition: border-color 0.2s;
         }
         .input-field:focus { border-color: #287DFA; }
+
+        /* Wallet Connect Styles */
+        .wallet-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .wallet-btn:active { transform: scale(0.95); background-color: #F9FAFB; }
+        .wallet-btn img { width: 40px; height: 40px; margin-bottom: 8px; border-radius: 8px; }
+        .wallet-btn span { font-size: 11px; font-weight: 600; color: #4B5563; }
+        .wallet-btn i { font-size: 24px; margin-bottom: 8px; color: #6B7280; }
     </style>
 </head>
 <body class="text-gray-800 antialiased h-screen overflow-hidden flex flex-col">
@@ -243,80 +261,198 @@
                 </div>
 
                 <!-- Method Tabs -->
-                <div class="bg-white px-4 pt-2 shadow-sm z-10 shrink-0">
+                <div class="bg-white px-2 pt-2 shadow-sm z-10 shrink-0">
                     <div class="flex border-b border-gray-200">
-                        <button onclick="setPaymentMode('scan')" id="tab-scan" class="flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">Scan QR</button>
-                        <button onclick="setPaymentMode('manual')" id="tab-manual" class="flex-1 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-colors">Verify & Transfer</button>
+                        <button onclick="setPaymentMode('connect')" id="tab-connect" class="flex-1 py-3 text-[13px] font-semibold text-gray-500 border-b-2 border-transparent transition-colors whitespace-nowrap">
+                            Wallet Connect
+                        </button>
+                        <button onclick="setPaymentMode('transfer')" id="tab-transfer" class="flex-1 py-3 text-[13px] font-bold text-blue-600 border-b-2 border-blue-600 transition-colors whitespace-nowrap">
+                            Transfer
+                        </button>
                     </div>
                 </div>
 
                 <!-- Main Content Area -->
                 <div class="flex-1 overflow-y-auto bg-white p-4 relative">
                     
-                    <!-- MODE A: Scan QR (Modified: Click to Save, No Address) -->
-                    <div id="view-scan" class="flex flex-col items-center justify-center h-full py-2 fade-in">
-                        <!-- QR Container -->
-                        <div onclick="saveQRCode()" class="bg-white p-4 border border-gray-200 rounded-2xl shadow-lg mb-6 relative cursor-pointer active:scale-95 transition-all hover:shadow-xl">
-                            <!-- Enlarged QR Code -->
-                            <img id="qr-image" src="" alt="QR Code" class="w-64 h-64 rounded-lg object-contain bg-gray-50 pointer-events-none">
-                            <div class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 hidden" id="qr-loader">
-                                <div class="loader w-8 h-8 border-4"></div>
-                            </div>
-                            
-                            <!-- Save Overlay Icon -->
-                            <div class="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md text-blue-600 opacity-80">
-                                <i class="fa-solid fa-download"></i>
-                            </div>
-                        </div>
+                    <!-- MODE A: Transfer (Form -> QR) -->
+                    <div id="view-transfer" class="hidden flex-col h-full fade-in">
                         
-                        <!-- Tip Text -->
-                        <p class="text-sm text-gray-500 font-semibold flex items-center gap-2 animate-pulse">
-                            <i class="fa-regular fa-hand-pointer"></i> Tap QR Code to Save Image
-                        </p>
-                    </div>
-
-                    <!-- MODE B: Manual Verification -->
-                    <div id="view-manual" class="hidden h-full flex flex-col pt-2 fade-in">
-                        <div id="manual-step-1" class="flex-1">
+                        <!-- STAGE 1: Verification Form -->
+                        <div id="transfer-form" class="flex-1">
                             <div class="bg-blue-50 rounded-lg p-3 mb-4 text-xs text-blue-800 leading-relaxed border border-blue-100">
-                                <strong class="block mb-1"><i class="fa-solid fa-shield-halved mr-1"></i> Security Check</strong>
-                                Verify your sending wallet address to ensure refund safety and prevent fraud.
+                                <strong class="block mb-1"><i class="fa-solid fa-shield-halved mr-1"></i> Security Verification</strong>
+                                To prevent fraud and ensure safety, please verify your sending wallet address before viewing the deposit details.
                             </div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Your Wallet Address</label>
-                            <textarea id="user-wallet-input" placeholder="Paste your wallet address here..." class="w-full h-24 border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500 resize-none mb-4 bg-gray-50"></textarea>
-                            <button onclick="verifyWallet()" id="verify-btn" class="w-full py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 transition shadow-sm">
-                                Verify Wallet
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Your Name</label>
+                                    <input type="text" id="sender-name" placeholder="e.g. John Doe" class="input-field">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Your Sending Wallet Address</label>
+                                    <textarea id="sender-wallet" placeholder="Paste your wallet address here..." class="w-full h-20 border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500 resize-none bg-gray-50"></textarea>
+                                    
+                                    <!-- HIGHLIGHTED VALIDATION MSG -->
+                                    <div class="mt-2 p-2 bg-red-50 rounded-lg border border-red-100 flex items-start gap-2">
+                                        <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5 text-[10px]"></i>
+                                        <p class="text-[11px] text-red-600 font-bold leading-tight">
+                                            Must be a valid <span id="req-chain-name" class="uppercase">TRC20</span> address.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="verifyTransferDetails()" class="w-full mt-6 py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 transition shadow-lg">
+                                Verify & Show Payment Details
                             </button>
                         </div>
 
-                        <div id="manual-step-2" class="hidden flex-1">
-                            <div class="flex items-center justify-center gap-2 text-green-600 text-sm font-bold mb-6 bg-green-50 py-2 rounded border border-green-100">
-                                <i class="fa-solid fa-check-circle"></i> Wallet Verified
+                        <!-- STAGE 2: Result (QR & Address) -->
+                        <div id="transfer-result" class="hidden flex-col h-full">
+                            <!-- Verified Badge -->
+                            <div class="flex items-center gap-2 text-green-600 text-sm font-bold mb-4 bg-green-50 py-2 px-3 rounded border border-green-100 shrink-0">
+                                <i class="fa-solid fa-check-circle"></i> 
+                                <span>Verified: <span id="verified-name" class="font-normal text-gray-600">User</span></span>
                             </div>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="text-xs text-gray-400 uppercase font-bold">Network</label>
-                                    <div class="font-bold text-gray-800 flex items-center gap-2">
-                                        <span id="summary-chain">TRC20</span>
-                                        <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full border border-gray-200">Exact Match Required</span>
+
+                            <div class="flex-1 overflow-y-auto pb-4">
+                                <!-- QR Code Card -->
+                                <div class="flex justify-center mb-4">
+                                    <div onclick="saveQRCode()" class="bg-white p-3 border border-gray-200 rounded-xl shadow-sm relative cursor-pointer active:scale-95 transition-all">
+                                        <img id="qr-image" src="" alt="QR Code" class="w-40 h-40 rounded-lg object-contain bg-gray-50 pointer-events-none">
+                                        <div class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 hidden" id="qr-loader">
+                                            <div class="loader w-8 h-8 border-4"></div>
+                                        </div>
+                                        <div class="absolute bottom-1 right-1 bg-white rounded-full p-1.5 shadow text-blue-600 text-xs">
+                                            <i class="fa-solid fa-download"></i>
+                                        </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <label class="text-xs text-gray-400 uppercase font-bold">Deposit Address</label>
-                                    <div class="flex gap-2 mt-1">
-                                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-base font-mono text-gray-700 break-all flex-1 leading-relaxed" id="deposit-address">...</div>
-                                        <button onclick="copyAddress()" class="bg-white border border-gray-200 text-blue-600 rounded-lg w-12 flex items-center justify-center shrink-0 shadow-sm active:bg-gray-50">
-                                            <i class="fa-regular fa-copy text-lg"></i>
-                                        </button>
+
+                                <!-- Details -->
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-xs text-gray-400 uppercase font-bold">Network</label>
+                                        <div class="font-bold text-gray-800 flex items-center gap-2">
+                                            <span id="summary-chain">TRC20</span>
+                                            <span class="bg-red-50 text-red-600 text-[9px] px-2 py-0.5 rounded-full border border-red-100 font-bold">MATCH NETWORK</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-400 uppercase font-bold">Deposit Address</label>
+                                        <div class="flex gap-2 mt-1">
+                                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs font-mono text-gray-700 break-all flex-1 leading-relaxed" id="deposit-address">...</div>
+                                            <button onclick="copyAddress()" class="bg-white border border-gray-200 text-blue-600 rounded-lg w-10 flex items-center justify-center shrink-0 shadow-sm active:bg-gray-50">
+                                                <i class="fa-regular fa-copy"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- MODE B: Wallet Connect -->
+                    <div id="view-connect" class="flex h-full flex-col fade-in relative">
+                        <!-- View: Wallet List -->
+                        <div id="connect-list" class="flex flex-col h-full">
+                            <div class="text-center mb-6 mt-4">
+                                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                                    <i class="fa-solid fa-link"></i>
+                                </div>
+                                <h3 class="text-sm font-bold text-gray-800">Connect Wallet</h3>
+                                <p class="text-xs text-gray-500 mt-1">Select your wallet to pay securely</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="wallet-btn" onclick="initiateWalletConnect('MetaMask')">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+                                    <span>MetaMask</span>
+                                </div>
+                                <div class="wallet-btn" onclick="initiateWalletConnect('Trust Wallet')">
+                                    <!-- Updated Trust Wallet Icon Source -->
+                                    <img src="https://avatars.githubusercontent.com/u/32119838?s=200&v=4" alt="Trust Wallet">
+                                    <span>Trust Wallet</span>
+                                </div>
+                                <div class="wallet-btn" onclick="initiateWalletConnect('WalletConnect')">
+                                    <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg" alt="WalletConnect">
+                                    <span>WalletConnect</span>
+                                </div>
+                                <div class="wallet-btn" onclick="initiateWalletConnect('Coinbase')">
+                                    <img src="https://avatars.githubusercontent.com/u/18060234?s=200&v=4" alt="Coinbase">
+                                    <span>Coinbase</span>
+                                </div>
+                                <!-- More Option -->
+                                <div class="wallet-btn col-span-2 flex-row gap-2 py-3" onclick="alert('Demo: More wallets modal would open here')">
+                                    <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs">
+                                        <i class="fa-solid fa-ellipsis"></i>
+                                    </div>
+                                    <span class="text-gray-500">More Wallets...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-auto text-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <p class="text-[10px] text-gray-400">
+                                    <i class="fa-solid fa-shield-halved mr-1"></i> Secure connection via WalletConnect protocol.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- View: Connecting Spinner -->
+                        <div id="connect-loading" class="hidden absolute inset-0 bg-white flex flex-col items-center justify-center z-10">
+                            <div class="w-12 h-12 border-4 border-gray-200 border-l-blue-600 rounded-full animate-spin mb-4"></div>
+                            <p class="font-bold text-sm text-gray-700" id="connect-status-text">Connecting...</p>
+                            <p class="text-xs text-gray-400 mt-1">Please approve the connection in your wallet</p>
+                        </div>
+
+                        <!-- View: Connected / Pay -->
+                        <div id="connect-pay" class="hidden flex flex-col h-full pt-4">
+                            <div class="bg-green-50 border border-green-100 rounded-xl p-4 mb-6 flex items-center gap-3">
+                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-green-800 font-bold">Connected Successfully</div>
+                                    <div class="text-[10px] text-green-600 font-mono mt-0.5 bg-white/50 px-1 rounded w-fit" id="connected-address">0x71C...9A23</div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center p-3 border border-gray-100 rounded-lg bg-gray-50">
+                                    <span class="text-xs font-bold text-gray-500">Balance</span>
+                                    <span class="text-sm font-bold text-gray-800" id="wallet-balance">2,450.00 USDT</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 border border-gray-100 rounded-lg bg-gray-50">
+                                    <span class="text-xs font-bold text-gray-500">Network</span>
+                                    <span class="text-sm font-bold text-gray-800 flex items-center gap-1">
+                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                        <span id="connect-network-name">Ethereum</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-xs text-gray-500">Total to pay</span>
+                                    <span class="text-xl font-bold text-trip-blue">$1,248.50</span>
+                                </div>
+                                <button onclick="handleWalletPay()" class="w-full bg-trip-blue text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
+                                    Confirm Payment
+                                </button>
+                                <button onclick="disconnectWallet()" class="w-full mt-3 text-xs text-gray-400 hover:text-red-400 transition-colors">
+                                    Disconnect Wallet
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- Footer Step 2 -->
-                <div class="bg-white border-t border-gray-200 p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                <!-- Footer Step 2 (Conditional) -->
+                <div id="footer-step2-default" class="hidden bg-white border-t border-gray-200 p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
                     <div class="bg-red-50 border border-red-100 text-red-600 text-[11px] p-2.5 rounded-lg mb-3 text-center leading-tight">
                         <i class="fa-solid fa-triangle-exclamation mr-1"></i>
                         Only send <strong id="warn-coin">USDT</strong> via <strong id="warn-chain">TRC20</strong>. Other assets will be lost.
@@ -379,25 +515,25 @@
         const config = {
             USDT: {
                 chains: [
-                    { name: 'TRC20',    fee: '~$0.8',  recommended: true,  address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' },
-                    { name: 'ERC20',    fee: '~$4.5',  recommended: false, address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
-                    { name: 'BEP20',    fee: '~$0.15', recommended: false, address: '0x55d398326f99059fF775485246999027B3197955' },
-                    { name: 'SOL',      fee: '<$0.01', recommended: true,  address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' },
-                    { name: 'POLYGON',  fee: '<$0.02', recommended: false, address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F' },
-                    { name: 'ARBITRUM', fee: '~$0.10', recommended: false, address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9' },
-                    { name: 'OPTIMISM', fee: '~$0.12', recommended: false, address: '0x94b008aA00579c1307B0EF2c499aD98a8ce98e26' },
-                    { name: 'AVAX-C',   fee: '~$0.20', recommended: false, address: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7' }
+                    { name: 'TRC20',    type: 'TRX', fee: '~$0.8',  recommended: true,  address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' },
+                    { name: 'ERC20',    type: 'EVM', fee: '~$4.5',  recommended: false, address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
+                    { name: 'BEP20',    type: 'EVM', fee: '~$0.15', recommended: false, address: '0x55d398326f99059fF775485246999027B3197955' },
+                    { name: 'SOL',      type: 'SOL', fee: '<$0.01', recommended: true,  address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' },
+                    { name: 'POLYGON',  type: 'EVM', fee: '<$0.02', recommended: false, address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F' },
+                    { name: 'ARBITRUM', type: 'EVM', fee: '~$0.10', recommended: false, address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9' },
+                    { name: 'OPTIMISM', type: 'EVM', fee: '~$0.12', recommended: false, address: '0x94b008aA00579c1307B0EF2c499aD98a8ce98e26' },
+                    { name: 'AVAX-C',   type: 'EVM', fee: '~$0.20', recommended: false, address: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7' }
                 ]
             },
             USDC: {
                 chains: [
-                    { name: 'ERC20',    fee: '~$4.5',  recommended: false, address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' },
-                    { name: 'SOL',      fee: '<$0.01', recommended: true,  address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
-                    { name: 'POLYGON',  fee: '<$0.02', recommended: true,  address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' },
-                    { name: 'BEP20',    fee: '~$0.15', recommended: false, address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d' },
-                    { name: 'ARBITRUM', fee: '~$0.10', recommended: false, address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' },
-                    { name: 'OPTIMISM', fee: '~$0.12', recommended: false, address: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' },
-                    { name: 'AVAX-C',   fee: '~$0.20', recommended: false, address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E' }
+                    { name: 'ERC20',    type: 'EVM', fee: '~$4.5',  recommended: false, address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' },
+                    { name: 'SOL',      type: 'SOL', fee: '<$0.01', recommended: true,  address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
+                    { name: 'POLYGON',  type: 'EVM', fee: '<$0.02', recommended: true,  address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' },
+                    { name: 'BEP20',    type: 'EVM', fee: '~$0.15', recommended: false, address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d' },
+                    { name: 'ARBITRUM', type: 'EVM', fee: '~$0.10', recommended: false, address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' },
+                    { name: 'OPTIMISM', type: 'EVM', fee: '~$0.12', recommended: false, address: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' },
+                    { name: 'AVAX-C',   type: 'EVM', fee: '~$0.20', recommended: false, address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E' }
                 ]
             }
         };
@@ -407,9 +543,11 @@
             method: 'card', 
             coin: 'USDT',
             chain: config.USDT.chains[0].name,
-            mode: 'scan',
+            chainType: config.USDT.chains[0].type,
+            mode: 'connect', // DEFAULT CHANGED TO 'connect'
             address: config.USDT.chains[0].address,
-            walletVerified: false
+            walletVerified: false,
+            connectedWallet: null
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -457,6 +595,8 @@
         function handleMainAction() {
             if (state.method === 'crypto') {
                 goToStep(2);
+                // Default to connect mode when entering step 2
+                setPaymentMode('connect'); 
             } else {
                 simulatePayment(true); 
             }
@@ -498,6 +638,7 @@
             state.coin = coin;
             const defaultChain = config[coin].chains[0];
             state.chain = defaultChain.name;
+            state.chainType = defaultChain.type;
             state.address = defaultChain.address;
             
             document.getElementById('btn-usdt').className = coin === 'USDT' 
@@ -515,7 +656,9 @@
         function selectChain(e, chainName) {
             e.stopPropagation();
             state.chain = chainName;
-            state.address = config[state.coin].chains.find(c => c.name === chainName).address;
+            const chainData = config[state.coin].chains.find(c => c.name === chainName);
+            state.address = chainData.address;
+            state.chainType = chainData.type;
             renderChains();
             updateLabels();
         }
@@ -560,40 +703,61 @@
 
         function setPaymentMode(mode) {
             state.mode = mode;
-            const scanTab = document.getElementById('tab-scan');
-            const manualTab = document.getElementById('tab-manual');
-            const scanView = document.getElementById('view-scan');
-            const manualView = document.getElementById('view-manual');
+            const tabs = ['connect', 'transfer'];
+            
+            // Update Tabs
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (t === mode) {
+                    el.className = "flex-1 py-3 text-[13px] font-bold text-blue-600 border-b-2 border-blue-600 transition-colors whitespace-nowrap";
+                } else {
+                    el.className = "flex-1 py-3 text-[13px] font-semibold text-gray-500 border-b-2 border-transparent transition-colors whitespace-nowrap";
+                }
+                
+                const view = document.getElementById(`view-${t}`);
+                if (t === mode) {
+                    view.classList.remove('hidden');
+                    view.classList.add('flex');
+                } else {
+                    view.classList.add('hidden');
+                    view.classList.remove('flex');
+                }
+            });
 
-            if (mode === 'scan') {
-                scanTab.className = "flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
-                manualTab.className = "flex-1 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-colors";
-                scanView.classList.remove('hidden');
-                manualView.classList.add('hidden');
+            // Toggle Footer for transfer mode
+            const footer = document.getElementById('footer-step2-default');
+            if (mode === 'transfer' && state.walletVerified) {
+                 footer.classList.remove('hidden');
             } else {
-                scanTab.className = "flex-1 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-colors";
-                manualTab.className = "flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
-                scanView.classList.add('hidden');
-                manualView.classList.remove('hidden');
+                 footer.classList.add('hidden');
             }
         }
 
-        function verifyWallet() {
-            const input = document.getElementById('user-wallet-input');
+        function verifyTransferDetails() {
+            const nameInput = document.getElementById('sender-name');
+            const walletInput = document.getElementById('sender-wallet');
             
-            // For Demo: Auto-fill if empty so user doesn't have to type
-            if (!input.value || input.value.trim() === "") {
-                input.value = "0xUserWalletAddressDemo123456"; 
-            }
+            const name = nameInput.value.trim();
+            const wallet = walletInput.value.trim();
 
-            // Instant success for demo
+            // DEMO MODE: Direct pass, no validation needed
+            // We will just auto-fill if empty to make it look smooth
+            if (!name) nameInput.value = "Demo User";
+            if (!wallet) walletInput.value = "T-DemoWalletAddress123456";
+
+            // Success
             state.walletVerified = true;
+            document.getElementById('verified-name').innerText = nameInput.value;
             
-            document.getElementById('manual-step-1').classList.add('hidden');
-            document.getElementById('manual-step-2').classList.remove('hidden');
-            document.getElementById('manual-step-2').classList.add('fade-in');
+            // Show Result, Hide Form
+            document.getElementById('transfer-form').classList.add('hidden');
+            document.getElementById('transfer-result').classList.remove('hidden');
+            document.getElementById('transfer-result').classList.add('flex');
             
-            showToast('Wallet Verified', 'text-green-400');
+            // Show Footer button "I Have Paid"
+            document.getElementById('footer-step2-default').classList.remove('hidden');
+            
+            showToast('Verified Successfully');
         }
 
         function updateLabels() {
@@ -601,8 +765,10 @@
                 'warn-coin': state.coin,
                 'warn-chain': state.chain,
                 'summary-chain': state.chain,
-                'scan-address-text': state.address,
-                'deposit-address': state.address
+                'req-chain-name': state.chain,
+                'deposit-address': state.address,
+                'wallet-balance': `2,450.00 ${state.coin}`,
+                'connect-network-name': state.chain
             };
             for (const [id, val] of Object.entries(els)) {
                 const el = document.getElementById(id);
@@ -622,11 +788,9 @@
         }
 
         function copyAddress() {
-            // Fallback for iframe environments where navigator.clipboard might be blocked
             const textArea = document.createElement("textarea");
             textArea.value = state.address;
             
-            // Ensure it's not visible but part of the DOM
             textArea.style.position = "fixed";
             textArea.style.left = "-9999px";
             textArea.style.top = "0";
@@ -650,14 +814,12 @@
             document.body.removeChild(textArea);
         }
 
-        // New: Save QR Code Function
         async function saveQRCode() {
             const img = document.getElementById('qr-image');
             const url = img.src;
             
             try {
                 showToast('Downloading QR...', 'text-blue-400', 'fa-circle-arrow-down');
-                // Try fetching blob to force download
                 const response = await fetch(url);
                 const blob = await response.blob();
                 const blobUrl = window.URL.createObjectURL(blob);
@@ -673,7 +835,6 @@
                 setTimeout(() => showToast('QR Saved to Photos'), 500);
             } catch (e) {
                 console.error(e);
-                // Fallback for CORS issues
                 window.open(url, '_blank');
                 showToast('Opened Image', 'text-gray-400');
             }
@@ -697,11 +858,12 @@
         }
 
         function simulatePayment(instant = false) {
-            if (!instant && state.mode === 'manual' && !state.walletVerified) {
-                showToast('Verify wallet first');
+            if (!instant && state.mode === 'transfer' && !state.walletVerified) {
+                showToast('Verify details first', 'text-red-400', 'fa-triangle-exclamation');
                 return;
             }
 
+            // Initial pending state for crypto
             if (state.method === 'crypto' && !instant) {
                 const pendingOverlay = document.getElementById('payment-pending-info');
                 pendingOverlay.classList.remove('hidden');
@@ -718,6 +880,34 @@
                 processing.classList.add('hidden');
                 document.getElementById('payment-success').classList.remove('hidden');
             }, 2000);
+        }
+
+        // --- Wallet Connect Flow Functions ---
+
+        function initiateWalletConnect(walletName) {
+            // Hide list, show loader
+            document.getElementById('connect-list').classList.add('hidden');
+            document.getElementById('connect-loading').classList.remove('hidden');
+            document.getElementById('connect-status-text').innerText = `Connecting to ${walletName}...`;
+
+            // Simulate Async Connection
+            setTimeout(() => {
+                document.getElementById('connect-loading').classList.add('hidden');
+                document.getElementById('connect-pay').classList.remove('hidden');
+                state.connectedWallet = walletName;
+                updateLabels();
+            }, 2000);
+        }
+
+        function handleWalletPay() {
+            // Show processing spinner then success
+            simulatePayment(true); // Use instant mode to skip pending overlay
+        }
+
+        function disconnectWallet() {
+            state.connectedWallet = null;
+            document.getElementById('connect-pay').classList.add('hidden');
+            document.getElementById('connect-list').classList.remove('hidden');
         }
 
         function startTimer(duration) {
