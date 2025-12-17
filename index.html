@@ -1,926 +1,416 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trip.com Style Checkout</title>
-    
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>巴西 CPF/CNPJ 智能输入组件</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #F0F2F5;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .trip-blue { color: #287DFA; }
-        .bg-trip-blue { background-color: #287DFA; }
-        .border-trip-blue { border-color: #287DFA; }
-
-        /* Page Transitions */
-        .slide-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .page-step {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            background-color: #F0F2F5;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .step-active { transform: translateX(0); opacity: 1; z-index: 10; }
-        .step-next { transform: translateX(100%); opacity: 0; z-index: 5; }
-        .step-prev { transform: translateX(-100%); opacity: 0; z-index: 5; }
-
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Method Selector Styles */
-        .method-card { transition: all 0.2s ease; overflow: hidden; }
-        .method-header { transition: background-color 0.2s ease; }
-        .method-body { max-height: 0; opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
-        
-        .method-selected { border-color: #287DFA; background-color: #fff; box-shadow: 0 4px 6px -1px rgba(40, 125, 250, 0.1); }
-        .method-selected .method-header { background-color: #F0F7FF; color: #287DFA; }
-        .method-selected .method-body { max-height: 800px; opacity: 1; padding-bottom: 1rem; }
-
-        /* Input Styles */
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .input-field:focus { border-color: #287DFA; }
-
-        /* Wallet Connect Styles */
-        .wallet-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            border: 1px solid #E5E7EB;
-            border-radius: 12px;
-            background: white;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .wallet-btn:active { transform: scale(0.95); background-color: #F9FAFB; }
-        .wallet-btn img { width: 40px; height: 40px; margin-bottom: 8px; border-radius: 8px; }
-        .wallet-btn span { font-size: 11px; font-weight: 600; color: #4B5563; }
-        .wallet-btn i { font-size: 24px; margin-bottom: 8px; color: #6B7280; }
+        body { font-family: 'Inter', sans-serif; }
+        .transition-all-300 { transition: all 0.3s ease-in-out; }
+        /* 自定义滚动条样式 (可选) */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="text-gray-800 antialiased h-screen overflow-hidden flex flex-col">
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 md:p-8">
 
-    <!-- MAIN CONTAINER -->
-    <div class="w-full max-w-md mx-auto bg-white h-full flex flex-col shadow-2xl relative">
-
-        <!-- HEADER -->
-        <header class="bg-white px-4 py-3 flex items-center justify-between z-30 shadow-sm shrink-0">
-            <button onclick="handleBack()" class="text-gray-600 text-xl p-2 hover:bg-gray-100 rounded-full transition w-10 h-10 flex items-center justify-center">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <h1 class="text-lg font-bold text-gray-800" id="header-title">Checkout</h1>
-            <div class="w-10"></div> 
-        </header>
-
-        <!-- SLIDER CONTAINER -->
-        <div class="slide-container flex-1 relative">
-
-            <!-- === STEP 1: PAYMENT METHOD SELECTION === -->
-            <div id="step-1" class="page-step step-active">
-                <!-- Timer -->
-                <div class="bg-[#FFF8E1] text-[#8A6D3B] text-sm px-4 py-2 flex items-center justify-center gap-2 shrink-0">
-                    <i class="fa-regular fa-clock"></i>
-                    <span>Pay within <b class="timer-display">14:59</b></span>
-                </div>
-
-                <!-- Content -->
-                <div class="flex-1 p-4 overflow-y-auto scroll-smooth pb-20">
-                    
-                    <!-- Amount Summary -->
-                    <div class="mb-6 text-center">
-                        <p class="text-gray-500 text-xs uppercase tracking-wide mb-1">Total Amount</p>
-                        <div class="text-3xl font-bold trip-blue">
-                            <span class="text-xl align-top">$</span>1,248.50
-                        </div>
-                    </div>
-
-                    <!-- Method List -->
-                    <div class="space-y-3">
-
-                        <!-- Method 1: Bank Card (Default) -->
-                        <div id="method-card" class="method-card method-selected border border-gray-200 rounded-xl" onclick="selectMethod('card')">
-                            <div class="method-header p-4 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                                        <i class="fa-regular fa-credit-card"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-sm">Credit / Debit Card</div>
-                                        <div class="flex gap-1 mt-0.5">
-                                            <i class="fa-brands fa-cc-visa text-gray-400 text-xs"></i>
-                                            <i class="fa-brands fa-cc-mastercard text-gray-400 text-xs"></i>
-                                            <i class="fa-brands fa-cc-amex text-gray-400 text-xs"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="w-4 h-4 rounded-full border border-gray-300 radio-indicator flex items-center justify-center">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full hidden selected-dot"></div>
-                                </div>
-                            </div>
-
-                            <div class="method-body px-4">
-                                <div class="pt-2 border-t border-gray-100 space-y-3">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Card Number</label>
-                                        <div class="relative">
-                                            <input type="tel" placeholder="0000 0000 0000 0000" class="input-field pl-10" maxlength="19">
-                                            <i class="fa-regular fa-credit-card absolute left-3.5 top-3.5 text-gray-400"></i>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-3">
-                                        <div class="flex-1">
-                                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Expiry</label>
-                                            <input type="tel" placeholder="MM/YY" class="input-field text-center" maxlength="5">
-                                        </div>
-                                        <div class="flex-1">
-                                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">CVV</label>
-                                            <input type="tel" placeholder="123" class="input-field text-center" maxlength="3">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Cardholder Name</label>
-                                        <input type="text" placeholder="YOUR NAME" class="input-field uppercase">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Method 2: Apple Pay -->
-                        <div id="method-apple" class="method-card border border-gray-200 rounded-xl" onclick="selectMethod('apple')">
-                            <div class="method-header p-4 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-white">
-                                        <i class="fa-brands fa-apple"></i>
-                                    </div>
-                                    <div class="font-bold text-sm">Apple Pay</div>
-                                </div>
-                                <div class="w-4 h-4 rounded-full border border-gray-300 radio-indicator flex items-center justify-center">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full hidden selected-dot"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="method-body px-4">
-                                <div class="pt-2 pb-2">
-                                    <p class="text-xs text-gray-500 mb-1">Use Face ID or Touch ID to verify payment securely.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Method 3: Crypto -->
-                        <div id="method-crypto" class="method-card border border-gray-200 rounded-xl" onclick="selectMethod('crypto')">
-                            <div class="method-header p-4 flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                        <i class="fa-solid fa-coins"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-sm">Stable Coin</div>
-                                        <div class="text-[10px] text-gray-400">USDT / USDC</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-red-100 text-red-600 text-[9px] font-bold px-1.5 py-0.5 rounded">RECOMMENDED</span>
-                                    <div class="w-4 h-4 rounded-full border border-gray-300 radio-indicator flex items-center justify-center">
-                                        <div class="w-2 h-2 bg-blue-500 rounded-full hidden selected-dot"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="method-body px-4">
-                                <!-- Config Section for Crypto -->
-                                <div class="pt-2 border-t border-blue-100/50">
-                                    <label class="text-xs font-bold text-gray-500 block mb-2 mt-2">Select Currency</label>
-                                    <div class="flex bg-gray-100 p-1 rounded-lg mb-4">
-                                        <button onclick="selectCoin(event, 'USDT')" id="btn-usdt" class="flex-1 py-2 rounded-md text-xs font-bold shadow-sm bg-white text-blue-600 transition-all flex items-center justify-center gap-1">
-                                            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="w-4 h-4" alt="USDT"> USDT
-                                        </button>
-                                        <button onclick="selectCoin(event, 'USDC')" id="btn-usdc" class="flex-1 py-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all flex items-center justify-center gap-1">
-                                            <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" class="w-4 h-4" alt="USDC"> USDC
-                                        </button>
-                                    </div>
-
-                                    <label class="text-xs font-bold text-gray-500 block mb-2">Select Network</label>
-                                    <div class="grid grid-cols-2 gap-2" id="chain-container">
-                                        <!-- Chains injected by JS -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Footer Step 1 -->
-                <div class="bg-white border-t border-gray-200 p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] relative z-20">
-                    <button id="main-action-btn" onclick="handleMainAction()" class="w-full bg-trip-blue text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
-                        Pay $1,248.50
-                    </button>
-                </div>
-            </div>
-
-            <!-- === STEP 2: CRYPTO EXECUTION (Only for Crypto) === -->
-            <div id="step-2" class="page-step step-next">
-                <!-- Timer Mini -->
-                <div class="bg-blue-50 text-blue-600 text-xs px-4 py-1.5 flex items-center justify-center gap-2 shrink-0 border-b border-blue-100">
-                    <i class="fa-regular fa-clock"></i>
-                    <span>Time remaining: <b class="timer-display">14:59</b></span>
-                </div>
-
-                <!-- Method Tabs -->
-                <div class="bg-white px-2 pt-2 shadow-sm z-10 shrink-0">
-                    <div class="flex border-b border-gray-200">
-                        <button onclick="setPaymentMode('connect')" id="tab-connect" class="flex-1 py-3 text-[13px] font-semibold text-gray-500 border-b-2 border-transparent transition-colors whitespace-nowrap">
-                            Wallet Connect
-                        </button>
-                        <button onclick="setPaymentMode('transfer')" id="tab-transfer" class="flex-1 py-3 text-[13px] font-bold text-blue-600 border-b-2 border-blue-600 transition-colors whitespace-nowrap">
-                            Transfer
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Main Content Area -->
-                <div class="flex-1 overflow-y-auto bg-white p-4 relative">
-                    
-                    <!-- MODE A: Transfer (Form -> QR) -->
-                    <div id="view-transfer" class="hidden flex-col h-full fade-in">
-                        
-                        <!-- STAGE 1: Verification Form -->
-                        <div id="transfer-form" class="flex-1">
-                            <div class="bg-blue-50 rounded-lg p-3 mb-4 text-xs text-blue-800 leading-relaxed border border-blue-100">
-                                <strong class="block mb-1"><i class="fa-solid fa-shield-halved mr-1"></i> Security Verification</strong>
-                                To prevent fraud and ensure safety, please verify your sending wallet address before viewing the deposit details.
-                            </div>
-
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Your Name</label>
-                                    <input type="text" id="sender-name" placeholder="e.g. John Doe" class="input-field">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Your Sending Wallet Address</label>
-                                    <textarea id="sender-wallet" placeholder="Paste your wallet address here..." class="w-full h-20 border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500 resize-none bg-gray-50"></textarea>
-                                    
-                                    <!-- HIGHLIGHTED VALIDATION MSG -->
-                                    <div class="mt-2 p-2 bg-red-50 rounded-lg border border-red-100 flex items-start gap-2">
-                                        <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5 text-[10px]"></i>
-                                        <p class="text-[11px] text-red-600 font-bold leading-tight">
-                                            Must be a valid <span id="req-chain-name" class="uppercase">TRC20</span> address.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button onclick="verifyTransferDetails()" class="w-full mt-6 py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 transition shadow-lg">
-                                Verify & Show Payment Details
-                            </button>
-                        </div>
-
-                        <!-- STAGE 2: Result (QR & Address) -->
-                        <div id="transfer-result" class="hidden flex-col h-full">
-                            <!-- Verified Badge -->
-                            <div class="flex items-center gap-2 text-green-600 text-sm font-bold mb-4 bg-green-50 py-2 px-3 rounded border border-green-100 shrink-0">
-                                <i class="fa-solid fa-check-circle"></i> 
-                                <span>Verified: <span id="verified-name" class="font-normal text-gray-600">User</span></span>
-                            </div>
-
-                            <div class="flex-1 overflow-y-auto pb-4">
-                                <!-- QR Code Card -->
-                                <div class="flex justify-center mb-4">
-                                    <div onclick="saveQRCode()" class="bg-white p-3 border border-gray-200 rounded-xl shadow-sm relative cursor-pointer active:scale-95 transition-all">
-                                        <img id="qr-image" src="" alt="QR Code" class="w-40 h-40 rounded-lg object-contain bg-gray-50 pointer-events-none">
-                                        <div class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 hidden" id="qr-loader">
-                                            <div class="loader w-8 h-8 border-4"></div>
-                                        </div>
-                                        <div class="absolute bottom-1 right-1 bg-white rounded-full p-1.5 shadow text-blue-600 text-xs">
-                                            <i class="fa-solid fa-download"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Details -->
-                                <div class="space-y-3">
-                                    <div>
-                                        <label class="text-xs text-gray-400 uppercase font-bold">Network</label>
-                                        <div class="font-bold text-gray-800 flex items-center gap-2">
-                                            <span id="summary-chain">TRC20</span>
-                                            <span class="bg-red-50 text-red-600 text-[9px] px-2 py-0.5 rounded-full border border-red-100 font-bold">MATCH NETWORK</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="text-xs text-gray-400 uppercase font-bold">Deposit Address</label>
-                                        <div class="flex gap-2 mt-1">
-                                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs font-mono text-gray-700 break-all flex-1 leading-relaxed" id="deposit-address">...</div>
-                                            <button onclick="copyAddress()" class="bg-white border border-gray-200 text-blue-600 rounded-lg w-10 flex items-center justify-center shrink-0 shadow-sm active:bg-gray-50">
-                                                <i class="fa-regular fa-copy"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MODE B: Wallet Connect -->
-                    <div id="view-connect" class="flex h-full flex-col fade-in relative">
-                        <!-- View: Wallet List -->
-                        <div id="connect-list" class="flex flex-col h-full">
-                            <div class="text-center mb-6 mt-4">
-                                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
-                                    <i class="fa-solid fa-link"></i>
-                                </div>
-                                <h3 class="text-sm font-bold text-gray-800">Connect Wallet</h3>
-                                <p class="text-xs text-gray-500 mt-1">Select your wallet to pay securely</p>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-3 mb-4">
-                                <div class="wallet-btn" onclick="initiateWalletConnect('MetaMask')">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-                                    <span>MetaMask</span>
-                                </div>
-                                <div class="wallet-btn" onclick="initiateWalletConnect('Trust Wallet')">
-                                    <!-- Updated Trust Wallet Icon Source -->
-                                    <img src="https://avatars.githubusercontent.com/u/32119838?s=200&v=4" alt="Trust Wallet">
-                                    <span>Trust Wallet</span>
-                                </div>
-                                <div class="wallet-btn" onclick="initiateWalletConnect('WalletConnect')">
-                                    <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg" alt="WalletConnect">
-                                    <span>WalletConnect</span>
-                                </div>
-                                <div class="wallet-btn" onclick="initiateWalletConnect('Coinbase')">
-                                    <img src="https://avatars.githubusercontent.com/u/18060234?s=200&v=4" alt="Coinbase">
-                                    <span>Coinbase</span>
-                                </div>
-                                <!-- More Option -->
-                                <div class="wallet-btn col-span-2 flex-row gap-2 py-3" onclick="alert('Demo: More wallets modal would open here')">
-                                    <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs">
-                                        <i class="fa-solid fa-ellipsis"></i>
-                                    </div>
-                                    <span class="text-gray-500">More Wallets...</span>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-auto text-center p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                <p class="text-[10px] text-gray-400">
-                                    <i class="fa-solid fa-shield-halved mr-1"></i> Secure connection via WalletConnect protocol.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- View: Connecting Spinner -->
-                        <div id="connect-loading" class="hidden absolute inset-0 bg-white flex flex-col items-center justify-center z-10">
-                            <div class="w-12 h-12 border-4 border-gray-200 border-l-blue-600 rounded-full animate-spin mb-4"></div>
-                            <p class="font-bold text-sm text-gray-700" id="connect-status-text">Connecting...</p>
-                            <p class="text-xs text-gray-400 mt-1">Please approve the connection in your wallet</p>
-                        </div>
-
-                        <!-- View: Connected / Pay -->
-                        <div id="connect-pay" class="hidden flex flex-col h-full pt-4">
-                            <div class="bg-green-50 border border-green-100 rounded-xl p-4 mb-6 flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm">
-                                    <i class="fa-solid fa-check"></i>
-                                </div>
-                                <div>
-                                    <div class="text-xs text-green-800 font-bold">Connected Successfully</div>
-                                    <div class="text-[10px] text-green-600 font-mono mt-0.5 bg-white/50 px-1 rounded w-fit" id="connected-address">0x71C...9A23</div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center p-3 border border-gray-100 rounded-lg bg-gray-50">
-                                    <span class="text-xs font-bold text-gray-500">Balance</span>
-                                    <span class="text-sm font-bold text-gray-800" id="wallet-balance">2,450.00 USDT</span>
-                                </div>
-                                <div class="flex justify-between items-center p-3 border border-gray-100 rounded-lg bg-gray-50">
-                                    <span class="text-xs font-bold text-gray-500">Network</span>
-                                    <span class="text-sm font-bold text-gray-800 flex items-center gap-1">
-                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                        <span id="connect-network-name">Ethereum</span>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="mt-auto">
-                                <div class="flex justify-between items-end mb-2">
-                                    <span class="text-xs text-gray-500">Total to pay</span>
-                                    <span class="text-xl font-bold text-trip-blue">$1,248.50</span>
-                                </div>
-                                <button onclick="handleWalletPay()" class="w-full bg-trip-blue text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
-                                    Confirm Payment
-                                </button>
-                                <button onclick="disconnectWallet()" class="w-full mt-3 text-xs text-gray-400 hover:text-red-400 transition-colors">
-                                    Disconnect Wallet
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Footer Step 2 (Conditional) -->
-                <div id="footer-step2-default" class="hidden bg-white border-t border-gray-200 p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
-                    <div class="bg-red-50 border border-red-100 text-red-600 text-[11px] p-2.5 rounded-lg mb-3 text-center leading-tight">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-                        Only send <strong id="warn-coin">USDT</strong> via <strong id="warn-chain">TRC20</strong>. Other assets will be lost.
-                    </div>
-                    <button onclick="simulatePayment()" class="w-full bg-trip-blue text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex justify-center items-center gap-2">
-                        I Have Paid
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- OVERLAYS -->
-        <div id="toast" class="absolute top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-2 px-4 rounded-full shadow-lg opacity-0 transition-opacity z-50 flex items-center gap-2 pointer-events-none">
-            <i class="fa-solid fa-check text-green-400"></i>
-            <span id="toast-msg">Copied</span>
-        </div>
-
-        <!-- Pending Information Overlay -->
-        <div id="payment-pending-info" class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center hidden fade-in p-6 text-center">
-            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-500 text-2xl">
-                <i class="fa-solid fa-hourglass-start animate-pulse"></i>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Payment Submitted</h2>
-            <p class="text-gray-500 text-sm mb-6 max-w-xs">We are verifying your transaction on the blockchain. This usually takes <strong class="text-gray-800">1-5 minutes</strong>.</p>
+    <!-- 主容器：响应式布局 (桌面端左右并排，移动端上下堆叠) -->
+    <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        <!-- 左侧/顶部：交互 Demo 卡片 -->
+        <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 border border-slate-100 sticky top-8">
             
-            <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 text-left w-full mb-8">
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-triangle-exclamation text-orange-500 mt-0.5"></i>
-                    <div class="text-xs text-orange-700 leading-relaxed">
-                        <strong class="block mb-1 text-orange-800">Important Warning</strong>
-                        Please do NOT pay again. Duplicate payments will be refunded automatically, but the received amount will be less due to network gas fees being deducted.
+            <!-- 标题区域 -->
+            <div class="mb-8 text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 mb-4 text-blue-600">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">Checkout Seguro</h1>
+                <p class="text-slate-500 text-sm mt-1">请输入您的巴西税务登记号以继续</p>
+            </div>
+
+            <!-- 输入表单组 -->
+            <div class="relative group">
+                <label for="docInput" class="block text-sm font-medium text-slate-700 mb-2 ml-1">
+                    CPF / CNPJ <span class="text-xs text-slate-400 font-normal">(仅限数字)</span>
+                </label>
+
+                <div class="relative">
+                    <input 
+                        type="tel" 
+                        id="docInput" 
+                        maxlength="18"
+                        placeholder="000.000.000-00"
+                        class="w-full pl-4 pr-12 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-lg tracking-wide text-slate-800 outline-none focus:bg-white transition-all-300 placeholder:text-slate-300"
+                    >
+                    
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+                        <i data-lucide="credit-card" id="icon-default" class="w-5 h-5 text-slate-400 transition-opacity duration-300"></i>
+                        <i data-lucide="check-circle-2" id="icon-success" class="w-6 h-6 text-emerald-500 opacity-0 absolute transition-opacity duration-300 scale-75"></i>
+                        <i data-lucide="alert-circle" id="icon-error" class="w-6 h-6 text-red-500 opacity-0 absolute transition-opacity duration-300 scale-75"></i>
                     </div>
+                </div>
+
+                <!-- 底部反馈信息 -->
+                <div class="flex justify-between items-start mt-2 px-1 h-6">
+                    <span id="feedback-msg" class="text-xs font-medium text-slate-400 transition-colors duration-300">
+                        请输入 11 位 CPF 或 14 位 CNPJ
+                    </span>
+                    <span id="type-badge" class="hidden text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500">
+                        未知
+                    </span>
                 </div>
             </div>
 
-            <p class="text-xs text-gray-400 mt-4">You will be redirected automatically...</p>
-        </div>
+            <button id="submitBtn" disabled class="w-full mt-8 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 disabled:shadow-none transition-all duration-300 transform active:scale-[0.98]">
+                确认支付
+            </button>
 
-        <!-- Processing Spinner -->
-        <div id="payment-processing" class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center hidden">
-            <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-            <h2 class="font-bold text-gray-800">Processing</h2>
-            <p class="text-gray-500 text-xs mt-1">Securely verifying transaction...</p>
-        </div>
-
-        <!-- Success Screen -->
-        <div id="payment-success" class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center hidden fade-in px-6">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-500 text-3xl">
-                <i class="fa-solid fa-check"></i>
+            <!-- 测试工具 -->
+            <div class="mt-10 pt-6 border-t border-dashed border-slate-200">
+                <p class="text-xs text-center text-slate-400 mb-3">🛠 测试辅助工具 (点击生成)</p>
+                <div class="flex gap-3 justify-center">
+                    <button onclick="fillRandom('cpf')" class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">生成 CPF</button>
+                    <button onclick="fillRandom('cnpj')" class="px-3 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">生成 CNPJ</button>
+                </div>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
-            <p class="text-gray-500 text-xs text-center mb-8">Your booking has been confirmed.</p>
-            <button onclick="location.reload()" class="w-full border border-trip-blue text-blue-600 font-bold py-3 rounded-xl">Return to Payment Home</button>
+        </div>
+
+        <!-- 右侧/底部：功能亮点说明 -->
+        <div class="space-y-6 lg:pl-4">
+            <div class="mb-4">
+                <h2 class="text-xl font-bold text-slate-800">核心功能亮点</h2>
+                <p class="text-slate-500 text-sm">Fintech 级别的表单交互体验设计</p>
+            </div>
+
+            <!-- 功能列表 -->
+            <div class="grid gap-4">
+                <!-- Feature 1 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                            <i data-lucide="combine" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800 text-sm">智能二合一输入 (Hybrid Input)</h3>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                无需切换单选框。单输入框同时支持 11位个人税号(CPF) 和 14位企业税号(CNPJ)，根据输入长度自动无缝切换模式。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                            <i data-lucide="wand-2" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800 text-sm">动态输入掩码 (Dynamic Masking)</h3>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                自动格式化。输入 <code>123456...</code> 自动变为 <code>123.456...</code>。支持随打随显，粘贴自动清洗杂乱字符。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-purple-500">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+                            <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800 text-sm">预测性意图识别 (Intent Detection)</h3>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                <span class="font-bold text-purple-600">核心亮点。</span>不仅仅看长度，更懂用户习惯：
+                                <br>• 输入 <code>12.</code> (第2位打点) → 立即切为 CNPJ 模式。
+                                <br>• 输入斜杠 <code>/</code> → 立即切为 CNPJ 模式。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
+                            <i data-lucide="undo-2" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800 text-sm">智能回退机制 (Smart Revert)</h3>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                即使已输入到 CNPJ 模式(12位)，一旦删除回退至 11位，系统自动判断为“输错”，立即切回 CPF 格式，避免用户卡死。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                            <i data-lucide="verified" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800 text-sm">算法级即时校验 (Real-time Validation)</h3>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                内置巴西官方 <strong>Modulo 11</strong> 算法。实时拦截无效校验位、拦截黑名单号码 (如 111.111...)，即时反馈提升通过率。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center pt-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-[10px] font-medium text-slate-500 uppercase tracking-wide">
+                    <i data-lucide="smartphone" class="w-3 h-3"></i> Mobile Optimized
+                </span>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // --- Configuration ---
-        const config = {
-            USDT: {
-                chains: [
-                    { name: 'TRC20',    type: 'TRX', fee: '~$0.8',  recommended: true,  address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' },
-                    { name: 'ERC20',    type: 'EVM', fee: '~$4.5',  recommended: false, address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
-                    { name: 'BEP20',    type: 'EVM', fee: '~$0.15', recommended: false, address: '0x55d398326f99059fF775485246999027B3197955' },
-                    { name: 'SOL',      type: 'SOL', fee: '<$0.01', recommended: true,  address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' },
-                    { name: 'POLYGON',  type: 'EVM', fee: '<$0.02', recommended: false, address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F' },
-                    { name: 'ARBITRUM', type: 'EVM', fee: '~$0.10', recommended: false, address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9' },
-                    { name: 'OPTIMISM', type: 'EVM', fee: '~$0.12', recommended: false, address: '0x94b008aA00579c1307B0EF2c499aD98a8ce98e26' },
-                    { name: 'AVAX-C',   type: 'EVM', fee: '~$0.20', recommended: false, address: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7' }
-                ]
-            },
-            USDC: {
-                chains: [
-                    { name: 'ERC20',    type: 'EVM', fee: '~$4.5',  recommended: false, address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' },
-                    { name: 'SOL',      type: 'SOL', fee: '<$0.01', recommended: true,  address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
-                    { name: 'POLYGON',  type: 'EVM', fee: '<$0.02', recommended: true,  address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' },
-                    { name: 'BEP20',    type: 'EVM', fee: '~$0.15', recommended: false, address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d' },
-                    { name: 'ARBITRUM', type: 'EVM', fee: '~$0.10', recommended: false, address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' },
-                    { name: 'OPTIMISM', type: 'EVM', fee: '~$0.12', recommended: false, address: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' },
-                    { name: 'AVAX-C',   type: 'EVM', fee: '~$0.20', recommended: false, address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E' }
-                ]
+        lucide.createIcons();
+
+        const input = document.getElementById('docInput');
+        const feedbackMsg = document.getElementById('feedback-msg');
+        const iconDefault = document.getElementById('icon-default');
+        const iconSuccess = document.getElementById('icon-success');
+        const iconError = document.getElementById('icon-error');
+        const typeBadge = document.getElementById('type-badge');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // --- 核心事件监听 ---
+
+        input.addEventListener('input', function(e) {
+            const rawValue = e.target.value;
+            const lastChar = rawValue.slice(-1);
+            // 检测是否是删除操作
+            const isDeleting = e.inputType && (e.inputType.includes('delete') || e.inputType === 'deleteContentBackward');
+            
+            // 1. 获取纯数字
+            let cleanValue = rawValue.replace(/\D/g, '');
+            
+            // 2. 限制最大长度 (CNPJ 14位)
+            if (cleanValue.length > 14) cleanValue = cleanValue.slice(0, 14);
+
+            // 3. 【智能意图识别 - 修复版】
+            let isExplicitCNPJ = cleanValue.length > 11;
+
+            if (!isExplicitCNPJ) {
+                // 显式 CNPJ 信号检测：
+                // 1. 包含斜杠
+                // 2. 以 "XX." 开头
+                // 3. 刚好 2 位数字且最后一位是点号
+                const hasCNPJSignal = rawValue.includes('/') || /^\d{2}\./.test(rawValue) || (cleanValue.length === 2 && lastChar === '.');
+
+                // 回退检测：仅当处于删除操作且长度回落到 11 位时，强制切回 CPF
+                const isBackToCPF = isDeleting && cleanValue.length === 11;
+
+                if (isBackToCPF) {
+                    isExplicitCNPJ = false; 
+                } else if (hasCNPJSignal) {
+                    isExplicitCNPJ = true;
+                }
             }
-        };
 
-        let state = {
-            step: 1,
-            method: 'card', 
-            coin: 'USDT',
-            chain: config.USDT.chains[0].name,
-            chainType: config.USDT.chains[0].type,
-            mode: 'connect', // DEFAULT CHANGED TO 'connect'
-            address: config.USDT.chains[0].address,
-            walletVerified: false,
-            connectedWallet: null
-        };
+            // 4. 应用掩码
+            let maskedValue = applyMask(cleanValue, isExplicitCNPJ);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            startTimer(15 * 60);
-            renderChains();
-            updateLabels();
-            selectMethod('card');
+            // 5. 手动输入分隔符支持
+            if (!isExplicitCNPJ) {
+                // CPF 模式
+                if ((cleanValue.length === 3 || cleanValue.length === 6) && lastChar === '.') maskedValue += '.';
+                if (cleanValue.length === 9 && lastChar === '-') maskedValue += '-';
+            } else {
+                // CNPJ 模式
+                if (cleanValue.length === 2 && lastChar === '.') maskedValue += '.';
+                if (cleanValue.length === 5 && lastChar === '.') maskedValue += '.';
+                if (cleanValue.length === 8 && lastChar === '/') maskedValue += '/';
+                if (cleanValue.length === 12 && lastChar === '-') maskedValue += '-';
+            }
+            
+            e.target.value = maskedValue;
+
+            // 6. 校验与渲染
+            validateAndRender(cleanValue, isExplicitCNPJ);
         });
 
-        // --- Logic ---
+        // --- 核心功能函数 ---
 
-        function selectMethod(method) {
-            state.method = method;
-            const methods = ['card', 'apple', 'crypto'];
-            methods.forEach(m => {
-                const el = document.getElementById(`method-${m}`);
-                const dot = el.querySelector('.selected-dot');
-                if (m === method) {
-                    el.classList.add('method-selected');
-                    el.classList.remove('border-gray-200');
-                    dot.classList.remove('hidden');
-                } else {
-                    el.classList.remove('method-selected');
-                    el.classList.add('border-gray-200');
-                    dot.classList.add('hidden');
+        function applyMask(value, isCNPJ) {
+            if (!value) return "";
+            
+            if (!isCNPJ) {
+                // CPF Mask: 000.000.000-00
+                return value
+                    .replace(/(\d{3})(\d)/, '$1.$2')
+                    .replace(/(\d{3})(\d)/, '$1.$2')
+                    .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+                    .replace(/(-\d{2})\d+?$/, '$1');
+            } else {
+                // CNPJ Mask: 00.000.000/0000-00
+                return value
+                    .replace(/^(\d{2})(\d)/, '$1.$2')
+                    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+                    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+                    .replace(/(\d{4})(\d)/, '$1-$2')
+                    .replace(/(-\d{2})\d+?$/, '$1');
+            }
+        }
+
+        function validateAndRender(cleanValue, isExplicitCNPJ) {
+            const length = cleanValue.length;
+            let isValid = false;
+            let type = '';
+            
+            if (length === 0) {
+                resetUI();
+                return;
+            }
+
+            if (isExplicitCNPJ) {
+                type = 'CNPJ';
+                if (length < 14) {
+                    setStatus('neutral', `还需输入 ${14 - length} 位数字`, type);
+                    return;
                 }
-            });
-
-            const btn = document.getElementById('main-action-btn');
-            if (method === 'crypto') {
-                btn.innerHTML = 'Next <i class="fa-solid fa-arrow-right text-sm"></i>';
-                btn.classList.add('bg-trip-blue');
-                btn.classList.remove('bg-black');
-            } else if (method === 'apple') {
-                btn.innerText = 'Pay $1,248.50 with Apple Pay';
-                btn.classList.remove('bg-trip-blue');
-                btn.classList.add('bg-black');
+                isValid = validateCNPJ(cleanValue);
             } else {
-                btn.innerText = 'Pay $1,248.50';
-                btn.classList.add('bg-trip-blue');
-                btn.classList.remove('bg-black');
-            }
-        }
-
-        function handleMainAction() {
-            if (state.method === 'crypto') {
-                goToStep(2);
-                // Default to connect mode when entering step 2
-                setPaymentMode('connect'); 
-            } else {
-                simulatePayment(true); 
-            }
-        }
-
-        function goToStep(step) {
-            const s1 = document.getElementById('step-1');
-            const s2 = document.getElementById('step-2');
-            const title = document.getElementById('header-title');
-            
-            state.step = step;
-
-            if (step === 1) {
-                s1.classList.remove('step-prev');
-                s1.classList.add('step-active');
-                s2.classList.remove('step-active');
-                s2.classList.add('step-next');
-                title.innerText = 'Checkout';
-            } else {
-                s1.classList.remove('step-active');
-                s1.classList.add('step-prev');
-                s2.classList.remove('step-next');
-                s2.classList.add('step-active');
-                title.innerText = 'Crypto Payment';
-                updateAddress();
-            }
-        }
-
-        function handleBack() {
-            if (state.step === 2) {
-                goToStep(1);
-            } else {
-                alert("Back to Merchant App");
-            }
-        }
-
-        function selectCoin(e, coin) {
-            e.stopPropagation();
-            state.coin = coin;
-            const defaultChain = config[coin].chains[0];
-            state.chain = defaultChain.name;
-            state.chainType = defaultChain.type;
-            state.address = defaultChain.address;
-            
-            document.getElementById('btn-usdt').className = coin === 'USDT' 
-                ? "flex-1 py-2 rounded-md text-xs font-bold shadow-sm bg-white text-blue-600 transition-all flex items-center justify-center gap-1"
-                : "flex-1 py-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all flex items-center justify-center gap-1";
-                
-            document.getElementById('btn-usdc').className = coin === 'USDC'
-                ? "flex-1 py-2 rounded-md text-xs font-bold shadow-sm bg-white text-blue-600 transition-all flex items-center justify-center gap-1"
-                : "flex-1 py-2 rounded-md text-xs font-semibold text-gray-500 hover:text-gray-700 transition-all flex items-center justify-center gap-1";
-
-            renderChains();
-            updateLabels();
-        }
-
-        function selectChain(e, chainName) {
-            e.stopPropagation();
-            state.chain = chainName;
-            const chainData = config[state.coin].chains.find(c => c.name === chainName);
-            state.address = chainData.address;
-            state.chainType = chainData.type;
-            renderChains();
-            updateLabels();
-        }
-
-        function renderChains() {
-            const container = document.getElementById('chain-container');
-            container.innerHTML = '';
-
-            config[state.coin].chains.forEach(item => {
-                const btn = document.createElement('div');
-                const isSelected = state.chain === item.name;
-                
-                btn.onclick = (e) => selectChain(e, item.name);
-                
-                btn.className = `relative cursor-pointer rounded-lg p-2 border transition-all flex items-center justify-between ${
-                    isSelected 
-                    ? 'border-trip-blue bg-blue-50 ring-1 ring-blue-100' 
-                    : 'border-gray-200 bg-white hover:bg-gray-50'
-                }`;
-
-                let badge = item.recommended 
-                    ? `<span class="bg-red-500 text-white text-[8px] font-bold px-1 py-0.5 rounded ml-1">BEST</span>` 
-                    : '';
-
-                btn.innerHTML = `
-                    <div class="flex items-center w-full overflow-hidden">
-                        <div class="w-3 h-3 rounded-full border border-gray-300 flex items-center justify-center mr-2 shrink-0 ${isSelected ? 'border-blue-500 bg-blue-500' : ''}">
-                            ${isSelected ? '<div class="w-1 h-1 bg-white rounded-full"></div>' : ''}
-                        </div>
-                        <div class="truncate">
-                            <div class="flex items-center">
-                                <span class="text-xs font-bold text-gray-800 truncate">${item.name}</span>
-                                ${badge}
-                            </div>
-                            <div class="text-[9px] text-gray-400 truncate">${item.fee}</div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(btn);
-            });
-        }
-
-        function setPaymentMode(mode) {
-            state.mode = mode;
-            const tabs = ['connect', 'transfer'];
-            
-            // Update Tabs
-            tabs.forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                if (t === mode) {
-                    el.className = "flex-1 py-3 text-[13px] font-bold text-blue-600 border-b-2 border-blue-600 transition-colors whitespace-nowrap";
-                } else {
-                    el.className = "flex-1 py-3 text-[13px] font-semibold text-gray-500 border-b-2 border-transparent transition-colors whitespace-nowrap";
+                type = 'CPF';
+                if (length < 11) {
+                    setStatus('neutral', `还需输入 ${11 - length} 位数字`, type);
+                    return;
                 }
-                
-                const view = document.getElementById(`view-${t}`);
-                if (t === mode) {
-                    view.classList.remove('hidden');
-                    view.classList.add('flex');
-                } else {
-                    view.classList.add('hidden');
-                    view.classList.remove('flex');
-                }
-            });
+                isValid = validateCPF(cleanValue);
+            }
 
-            // Toggle Footer for transfer mode
-            const footer = document.getElementById('footer-step2-default');
-            if (mode === 'transfer' && state.walletVerified) {
-                 footer.classList.remove('hidden');
+            if (isValid) {
+                setStatus('success', `${type} 有效`, type);
             } else {
-                 footer.classList.add('hidden');
+                setStatus('error', `${type} 无效，请检查`, type);
             }
         }
 
-        function verifyTransferDetails() {
-            const nameInput = document.getElementById('sender-name');
-            const walletInput = document.getElementById('sender-wallet');
+        function setStatus(status, msg, typeText) {
+            feedbackMsg.textContent = msg;
+            typeBadge.textContent = typeText;
+            typeBadge.classList.remove('hidden');
             
-            const name = nameInput.value.trim();
-            const wallet = walletInput.value.trim();
+            input.classList.remove('border-slate-200', 'border-red-500', 'border-emerald-500', 'focus:ring-blue-100', 'focus:border-blue-500');
+            iconDefault.style.opacity = '0';
+            iconSuccess.style.opacity = '0';
+            iconError.style.opacity = '0';
+            iconSuccess.classList.remove('scale-100');
+            iconError.classList.remove('scale-100');
 
-            // DEMO MODE: Direct pass, no validation needed
-            // We will just auto-fill if empty to make it look smooth
-            if (!name) nameInput.value = "Demo User";
-            if (!wallet) walletInput.value = "T-DemoWalletAddress123456";
-
-            // Success
-            state.walletVerified = true;
-            document.getElementById('verified-name').innerText = nameInput.value;
-            
-            // Show Result, Hide Form
-            document.getElementById('transfer-form').classList.add('hidden');
-            document.getElementById('transfer-result').classList.remove('hidden');
-            document.getElementById('transfer-result').classList.add('flex');
-            
-            // Show Footer button "I Have Paid"
-            document.getElementById('footer-step2-default').classList.remove('hidden');
-            
-            showToast('Verified Successfully');
+            if (status === 'success') {
+                input.classList.add('border-emerald-500', 'focus:ring-emerald-100', 'focus:border-emerald-500', 'text-emerald-700', 'bg-emerald-50/30');
+                feedbackMsg.className = 'text-xs font-medium text-emerald-600 transition-colors duration-300';
+                typeBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-600';
+                iconSuccess.style.opacity = '1';
+                iconSuccess.classList.add('scale-100');
+                submitBtn.disabled = false;
+            } else if (status === 'error') {
+                input.classList.add('border-red-500', 'focus:ring-red-100', 'focus:border-red-500', 'text-red-700', 'bg-red-50/30');
+                feedbackMsg.className = 'text-xs font-medium text-red-500 transition-colors duration-300';
+                typeBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-red-100 text-red-600';
+                iconError.style.opacity = '1';
+                iconError.classList.add('scale-100');
+                submitBtn.disabled = true;
+            } else {
+                input.classList.add('border-slate-200', 'focus:ring-blue-100', 'focus:border-blue-500', 'text-slate-800');
+                feedbackMsg.className = 'text-xs font-medium text-blue-500 transition-colors duration-300';
+                typeBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500';
+                iconDefault.style.opacity = '1';
+                submitBtn.disabled = true;
+            }
         }
 
-        function updateLabels() {
-            const els = {
-                'warn-coin': state.coin,
-                'warn-chain': state.chain,
-                'summary-chain': state.chain,
-                'req-chain-name': state.chain,
-                'deposit-address': state.address,
-                'wallet-balance': `2,450.00 ${state.coin}`,
-                'connect-network-name': state.chain
+        function resetUI() {
+            input.classList.remove('text-emerald-700', 'bg-emerald-50/30', 'text-red-700', 'bg-red-50/30');
+            input.classList.add('text-slate-800');
+            feedbackMsg.textContent = '请输入 11 位 CPF 或 14 位 CNPJ';
+            typeBadge.classList.add('hidden');
+            iconDefault.style.opacity = '1';
+            iconSuccess.style.opacity = '0';
+            iconError.style.opacity = '0';
+            input.classList.add('border-slate-200');
+        }
+
+        // --- 核心校验算法 (Modulo 11) ---
+
+        function validateCPF(cpf) {
+            if (/^(\d)\1+$/.test(cpf)) return false;
+            let sum = 0, remainder;
+            for (let i = 1; i <= 9; i++) sum = sum + parseInt(cpf.substring(i-1, i)) * (11 - i);
+            remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+            sum = 0;
+            for (let i = 1; i <= 10; i++) sum = sum + parseInt(cpf.substring(i-1, i)) * (12 - i);
+            remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            return remainder === parseInt(cpf.substring(10, 11));
+        }
+
+        function validateCNPJ(cnpj) {
+            if (/^(\d)\1+$/.test(cnpj)) return false;
+            const calc = (x) => {
+                const slice = cnpj.substring(0, x);
+                let sum = 0, pos = x - 7;
+                for (let i = x; i >= 1; i--) {
+                    sum += slice.charAt(x - i) * pos--;
+                    if (pos < 2) pos = 9;
+                }
+                return sum % 11 < 2 ? 0 : 11 - sum % 11;
             };
-            for (const [id, val] of Object.entries(els)) {
-                const el = document.getElementById(id);
-                if(el) el.innerText = val;
+            return calc(12) === parseInt(cnpj.charAt(12)) && calc(13) === parseInt(cnpj.charAt(13));
+        }
+
+        // --- 测试工具 ---
+        function fillRandom(type) {
+            const rnd = (n) => Math.round(Math.random() * n);
+            const mod = (a, b) => Math.round(a - (Math.floor(a / b) * b));
+            if (type === 'cpf') {
+                const n = Array.from({length: 9}, () => rnd(9));
+                let d1 = n.reduce((acc, curr, i) => acc + curr * (10-i), 0);
+                d1 = 11 - mod(d1, 11); if (d1 >= 10) d1 = 0;
+                let d2 = n.reduce((acc, curr, i) => acc + curr * (11-i), 0) + d1*2;
+                d2 = 11 - mod(d2, 11); if (d2 >= 10) d2 = 0;
+                const val = n.join('') + d1 + d2;
+                input.value = applyMask(val, false);
+                validateAndRender(val, false);
+            } else {
+                const n = Array.from({length: 8}, () => rnd(9));
+                const b = [0,0,0,1]; // 0001
+                const base = [...n, ...b];
+                const calcD = (arr, startW) => {
+                    let s = 0;
+                    let w = startW;
+                    for(let i=0; i < arr.length; i++) {
+                        s += arr[i] * w;
+                        w--;
+                        if(w < 2) w = 9;
+                    }
+                    const r = s % 11;
+                    return r < 2 ? 0 : 11 - r;
+                };
+                const d1 = calcD(base, 5);
+                const d2 = calcD([...base, d1], 6);
+                const val = base.join('') + d1 + d2;
+                input.value = applyMask(val, true);
+                validateAndRender(val, true);
             }
-        }
-
-        function updateAddress() {
-            const qrImg = document.getElementById('qr-image');
-            const loader = document.getElementById('qr-loader');
-            loader.classList.remove('hidden');
-            setTimeout(() => {
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${state.address}`;
-                qrImg.onload = () => loader.classList.add('hidden');
-            }, 200);
-            updateLabels();
-        }
-
-        function copyAddress() {
-            const textArea = document.createElement("textarea");
-            textArea.value = state.address;
-            
-            textArea.style.position = "fixed";
-            textArea.style.left = "-9999px";
-            textArea.style.top = "0";
-            document.body.appendChild(textArea);
-            
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast('Copied!');
-                } else {
-                    showToast('Copy failed', 'text-red-400', 'fa-circle-xmark');
-                }
-            } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-                showToast('Copy error', 'text-red-400', 'fa-circle-xmark');
-            }
-            
-            document.body.removeChild(textArea);
-        }
-
-        async function saveQRCode() {
-            const img = document.getElementById('qr-image');
-            const url = img.src;
-            
-            try {
-                showToast('Downloading QR...', 'text-blue-400', 'fa-circle-arrow-down');
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-                
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = `payment_qr_${state.coin}_${state.chain}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(blobUrl);
-                
-                setTimeout(() => showToast('QR Saved to Photos'), 500);
-            } catch (e) {
-                console.error(e);
-                window.open(url, '_blank');
-                showToast('Opened Image', 'text-gray-400');
-            }
-        }
-
-        function showToast(msg, colorClass = 'text-green-400', iconClass = 'fa-circle-check') {
-            const t = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-msg');
-            const iconEl = t.querySelector('i');
-
-            msgEl.innerText = msg;
-            iconEl.className = `fa-solid ${iconClass} ${colorClass}`;
-            
-            t.classList.remove('opacity-0', 'top-16');
-            t.classList.add('top-20');
-            
-            setTimeout(() => { 
-                t.classList.add('opacity-0', 'top-16'); 
-                t.classList.remove('top-20'); 
-            }, 2000);
-        }
-
-        function simulatePayment(instant = false) {
-            if (!instant && state.mode === 'transfer' && !state.walletVerified) {
-                showToast('Verify details first', 'text-red-400', 'fa-triangle-exclamation');
-                return;
-            }
-
-            // Initial pending state for crypto
-            if (state.method === 'crypto' && !instant) {
-                const pendingOverlay = document.getElementById('payment-pending-info');
-                pendingOverlay.classList.remove('hidden');
-                setTimeout(() => {
-                    pendingOverlay.classList.add('hidden');
-                    document.getElementById('payment-success').classList.remove('hidden');
-                }, 4000);
-                return;
-            }
-
-            const processing = document.getElementById('payment-processing');
-            processing.classList.remove('hidden');
-            setTimeout(() => {
-                processing.classList.add('hidden');
-                document.getElementById('payment-success').classList.remove('hidden');
-            }, 2000);
-        }
-
-        // --- Wallet Connect Flow Functions ---
-
-        function initiateWalletConnect(walletName) {
-            // Hide list, show loader
-            document.getElementById('connect-list').classList.add('hidden');
-            document.getElementById('connect-loading').classList.remove('hidden');
-            document.getElementById('connect-status-text').innerText = `Connecting to ${walletName}...`;
-
-            // Simulate Async Connection
-            setTimeout(() => {
-                document.getElementById('connect-loading').classList.add('hidden');
-                document.getElementById('connect-pay').classList.remove('hidden');
-                state.connectedWallet = walletName;
-                updateLabels();
-            }, 2000);
-        }
-
-        function handleWalletPay() {
-            // Show processing spinner then success
-            simulatePayment(true); // Use instant mode to skip pending overlay
-        }
-
-        function disconnectWallet() {
-            state.connectedWallet = null;
-            document.getElementById('connect-pay').classList.add('hidden');
-            document.getElementById('connect-list').classList.remove('hidden');
-        }
-
-        function startTimer(duration) {
-            let timer = duration;
-            const displays = document.querySelectorAll('.timer-display');
-            setInterval(() => {
-                let m = parseInt(timer / 60, 10);
-                let s = parseInt(timer % 60, 10);
-                m = m < 10 ? "0" + m : m;
-                s = s < 10 ? "0" + s : s;
-                displays.forEach(d => d.innerText = m + ":" + s);
-                if (--timer < 0) timer = 0;
-            }, 1000);
         }
     </script>
 </body>
