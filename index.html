@@ -1,417 +1,63 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>巴西 CPF/CNPJ 智能输入组件</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <title>街口支付喚起測試</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .transition-all-300 { transition: all 0.3s ease-in-out; }
-        /* 自定义滚动条样式 (可选) */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .pay-btn {
+            background-color: #c8102e; /* 街口红 */
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .debug-text {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+            padding: 0 20px;
+            text-align: center;
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 md:p-8">
+<body>
 
-    <!-- 主容器：响应式布局 (桌面端左右并排，移动端上下堆叠) -->
-    <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        
-        <!-- 左侧/顶部：交互 Demo 卡片 -->
-        <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 border border-slate-100 sticky top-8">
-            
-            <!-- 标题区域 -->
-            <div class="mb-8 text-center">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 mb-4 text-blue-600">
-                    <i data-lucide="shield-check" class="w-6 h-6"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-slate-800">Checkout Seguro</h1>
-                <p class="text-slate-500 text-sm mt-1">请输入您的巴西税务登记号以继续</p>
-            </div>
+    <a id="jkosLink" class="pay-btn" href="#">
+        點擊支付 (Open Jkopay)
+    </a>
 
-            <!-- 输入表单组 -->
-            <div class="relative group">
-                <label for="docInput" class="block text-sm font-medium text-slate-700 mb-2 ml-1">
-                    CPF / CNPJ <span class="text-xs text-slate-400 font-normal">(仅限数字)</span>
-                </label>
-
-                <div class="relative">
-                    <input 
-                        type="tel" 
-                        id="docInput" 
-                        maxlength="18"
-                        placeholder="000.000.000-00"
-                        class="w-full pl-4 pr-12 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-lg tracking-wide text-slate-800 outline-none focus:bg-white transition-all-300 placeholder:text-slate-300"
-                    >
-                    
-                    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
-                        <i data-lucide="credit-card" id="icon-default" class="w-5 h-5 text-slate-400 transition-opacity duration-300"></i>
-                        <i data-lucide="check-circle-2" id="icon-success" class="w-6 h-6 text-emerald-500 opacity-0 absolute transition-opacity duration-300 scale-75"></i>
-                        <i data-lucide="alert-circle" id="icon-error" class="w-6 h-6 text-red-500 opacity-0 absolute transition-opacity duration-300 scale-75"></i>
-                    </div>
-                </div>
-
-                <!-- 底部反馈信息 -->
-                <div class="flex justify-between items-start mt-2 px-1 h-6">
-                    <span id="feedback-msg" class="text-xs font-medium text-slate-400 transition-colors duration-300">
-                        请输入 11 位 CPF 或 14 位 CNPJ
-                    </span>
-                    <span id="type-badge" class="hidden text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500">
-                        未知
-                    </span>
-                </div>
-            </div>
-
-            <button id="submitBtn" disabled class="w-full mt-8 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 disabled:shadow-none transition-all duration-300 transform active:scale-[0.98]">
-                确认支付
-            </button>
-
-            <!-- 测试工具 -->
-            <div class="mt-10 pt-6 border-t border-dashed border-slate-200">
-                <p class="text-xs text-center text-slate-400 mb-3">🛠 测试辅助工具 (点击生成)</p>
-                <div class="flex gap-3 justify-center">
-                    <button onclick="fillRandom('cpf')" class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">生成 CPF</button>
-                    <button onclick="fillRandom('cnpj')" class="px-3 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">生成 CNPJ</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 右侧/底部：功能亮点说明 -->
-        <div class="space-y-6 lg:pl-4">
-            <div class="mb-4">
-                <h2 class="text-xl font-bold text-slate-800">核心功能亮点</h2>
-                <p class="text-slate-500 text-sm">Fintech 级别的表单交互体验设计</p>
-            </div>
-
-            <!-- 功能列表 -->
-            <div class="grid gap-4">
-                <!-- Feature 1 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
-                            <i data-lucide="combine" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800 text-sm">智能二合一输入 (Hybrid Input)</h3>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                无需切换单选框。单输入框同时支持 11位个人税号(CPF) 和 14位企业税号(CNPJ)，根据输入长度自动无缝切换模式。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-                            <i data-lucide="wand-2" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800 text-sm">动态输入掩码 (Dynamic Masking)</h3>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                自动格式化。输入 <code>123456...</code> 自动变为 <code>123.456...</code>。支持随打随显，粘贴自动清洗杂乱字符。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-purple-500">
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
-                            <i data-lucide="brain-circuit" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800 text-sm">预测性意图识别 (Intent Detection)</h3>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                <span class="font-bold text-purple-600">核心亮点。</span>不仅仅看长度，更懂用户习惯：
-                                <br>• 输入 <code>12.</code> (第2位打点) → 立即切为 CNPJ 模式。
-                                <br>• 输入斜杠 <code>/</code> → 立即切为 CNPJ 模式。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
-                            <i data-lucide="undo-2" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800 text-sm">智能回退机制 (Smart Revert)</h3>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                即使已输入到 CNPJ 模式(12位)，一旦删除回退至 11位，系统自动判断为“输错”，立即切回 CPF 格式，避免用户卡死。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                            <i data-lucide="verified" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-slate-800 text-sm">算法级即时校验 (Real-time Validation)</h3>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                                内置巴西官方 <strong>Modulo 11</strong> 算法。实时拦截无效校验位、拦截黑名单号码 (如 111.111...)，即时反馈提升通过率。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center pt-4">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-[10px] font-medium text-slate-500 uppercase tracking-wide">
-                    <i data-lucide="smartphone" class="w-3 h-3"></i> Mobile Optimized
-                </span>
-            </div>
-        </div>
-
+    <div class="debug-text">
+        正在喚起 URL: jkos://OnlinePay/...
     </div>
 
     <script>
-        lucide.createIcons();
+        // 你的原始 URL字符串
+        var rawUrl = "jkos://OnlinePay/j=OL#1:ENT#dXp6eWdVL1pCZk5LOTJDZkpwbzlWUT09:S#c71b1881-4b2f-11f0-bdc1-f8f21e0d1b98:A#18197:CUR#TWD:SRC#REDIRECT_MWEB:UNRDM#0.00:FX#0:TA#18197:TCUR#TWD:FXR#1.00:UR#1:D#D&s=df08185483b3ebd8793cb32ed8ac1bc593b17e929ff5abdd3a808bc23936685e";
 
-        const input = document.getElementById('docInput');
-        const feedbackMsg = document.getElementById('feedback-msg');
-        const iconDefault = document.getElementById('icon-default');
-        const iconSuccess = document.getElementById('icon-success');
-        const iconError = document.getElementById('icon-error');
-        const typeBadge = document.getElementById('type-badge');
-        const submitBtn = document.getElementById('submitBtn');
+        // 获取按钮元素
+        var linkBtn = document.getElementById('jkosLink');
+        
+        // 设置 href
+        linkBtn.href = rawUrl;
 
-        // --- 核心事件监听 ---
-
-        input.addEventListener('input', function(e) {
-            const rawValue = e.target.value;
-            const lastChar = rawValue.slice(-1);
-            // 检测是否是删除操作
-            const isDeleting = e.inputType && (e.inputType.includes('delete') || e.inputType === 'deleteContentBackward');
-            
-            // 1. 获取纯数字
-            let cleanValue = rawValue.replace(/\D/g, '');
-            
-            // 2. 限制最大长度 (CNPJ 14位)
-            if (cleanValue.length > 14) cleanValue = cleanValue.slice(0, 14);
-
-            // 3. 【智能意图识别 - 修复版】
-            let isExplicitCNPJ = cleanValue.length > 11;
-
-            if (!isExplicitCNPJ) {
-                // 显式 CNPJ 信号检测：
-                // 1. 包含斜杠
-                // 2. 以 "XX." 开头
-                // 3. 刚好 2 位数字且最后一位是点号
-                const hasCNPJSignal = rawValue.includes('/') || /^\d{2}\./.test(rawValue) || (cleanValue.length === 2 && lastChar === '.');
-
-                // 回退检测：仅当处于删除操作且长度回落到 11 位时，强制切回 CPF
-                const isBackToCPF = isDeleting && cleanValue.length === 11;
-
-                if (isBackToCPF) {
-                    isExplicitCNPJ = false; 
-                } else if (hasCNPJSignal) {
-                    isExplicitCNPJ = true;
-                }
-            }
-
-            // 4. 应用掩码
-            let maskedValue = applyMask(cleanValue, isExplicitCNPJ);
-
-            // 5. 手动输入分隔符支持
-            if (!isExplicitCNPJ) {
-                // CPF 模式
-                if ((cleanValue.length === 3 || cleanValue.length === 6) && lastChar === '.') maskedValue += '.';
-                if (cleanValue.length === 9 && lastChar === '-') maskedValue += '-';
-            } else {
-                // CNPJ 模式
-                if (cleanValue.length === 2 && lastChar === '.') maskedValue += '.';
-                if (cleanValue.length === 5 && lastChar === '.') maskedValue += '.';
-                if (cleanValue.length === 8 && lastChar === '/') maskedValue += '/';
-                if (cleanValue.length === 12 && lastChar === '-') maskedValue += '-';
-            }
-            
-            e.target.value = maskedValue;
-
-            // 6. 校验与渲染
-            validateAndRender(cleanValue, isExplicitCNPJ);
-        });
-
-        // --- 核心功能函数 ---
-
-        function applyMask(value, isCNPJ) {
-            if (!value) return "";
-            
-            if (!isCNPJ) {
-                // CPF Mask: 000.000.000-00
-                return value
-                    .replace(/(\d{3})(\d)/, '$1.$2')
-                    .replace(/(\d{3})(\d)/, '$1.$2')
-                    .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-                    .replace(/(-\d{2})\d+?$/, '$1');
-            } else {
-                // CNPJ Mask: 00.000.000/0000-00
-                return value
-                    .replace(/^(\d{2})(\d)/, '$1.$2')
-                    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-                    .replace(/\.(\d{3})(\d)/, '.$1/$2')
-                    .replace(/(\d{4})(\d)/, '$1-$2')
-                    .replace(/(-\d{2})\d+?$/, '$1');
-            }
-        }
-
-        function validateAndRender(cleanValue, isExplicitCNPJ) {
-            const length = cleanValue.length;
-            let isValid = false;
-            let type = '';
-            
-            if (length === 0) {
-                resetUI();
-                return;
-            }
-
-            if (isExplicitCNPJ) {
-                type = 'CNPJ';
-                if (length < 14) {
-                    setStatus('neutral', `还需输入 ${14 - length} 位数字`, type);
-                    return;
-                }
-                isValid = validateCNPJ(cleanValue);
-            } else {
-                type = 'CPF';
-                if (length < 11) {
-                    setStatus('neutral', `还需输入 ${11 - length} 位数字`, type);
-                    return;
-                }
-                isValid = validateCPF(cleanValue);
-            }
-
-            if (isValid) {
-                setStatus('success', `${type} 有效`, type);
-            } else {
-                setStatus('error', `${type} 无效，请检查`, type);
-            }
-        }
-
-        function setStatus(status, msg, typeText) {
-            feedbackMsg.textContent = msg;
-            typeBadge.textContent = typeText;
-            typeBadge.classList.remove('hidden');
-            
-            input.classList.remove('border-slate-200', 'border-red-500', 'border-emerald-500', 'focus:ring-blue-100', 'focus:border-blue-500');
-            iconDefault.style.opacity = '0';
-            iconSuccess.style.opacity = '0';
-            iconError.style.opacity = '0';
-            iconSuccess.classList.remove('scale-100');
-            iconError.classList.remove('scale-100');
-
-            if (status === 'success') {
-                input.classList.add('border-emerald-500', 'focus:ring-emerald-100', 'focus:border-emerald-500', 'text-emerald-700', 'bg-emerald-50/30');
-                feedbackMsg.className = 'text-xs font-medium text-emerald-600 transition-colors duration-300';
-                typeBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-600';
-                iconSuccess.style.opacity = '1';
-                iconSuccess.classList.add('scale-100');
-                submitBtn.disabled = false;
-            } else if (status === 'error') {
-                input.classList.add('border-red-500', 'focus:ring-red-100', 'focus:border-red-500', 'text-red-700', 'bg-red-50/30');
-                feedbackMsg.className = 'text-xs font-medium text-red-500 transition-colors duration-300';
-                typeBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-red-100 text-red-600';
-                iconError.style.opacity = '1';
-                iconError.classList.add('scale-100');
-                submitBtn.disabled = true;
-            } else {
-                input.classList.add('border-slate-200', 'focus:ring-blue-100', 'focus:border-blue-500', 'text-slate-800');
-                feedbackMsg.className = 'text-xs font-medium text-blue-500 transition-colors duration-300';
-                typeBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500';
-                iconDefault.style.opacity = '1';
-                submitBtn.disabled = true;
-            }
-        }
-
-        function resetUI() {
-            input.classList.remove('text-emerald-700', 'bg-emerald-50/30', 'text-red-700', 'bg-red-50/30');
-            input.classList.add('text-slate-800');
-            feedbackMsg.textContent = '请输入 11 位 CPF 或 14 位 CNPJ';
-            typeBadge.classList.add('hidden');
-            iconDefault.style.opacity = '1';
-            iconSuccess.style.opacity = '0';
-            iconError.style.opacity = '0';
-            input.classList.add('border-slate-200');
-        }
-
-        // --- 核心校验算法 (Modulo 11) ---
-
-        function validateCPF(cpf) {
-            if (/^(\d)\1+$/.test(cpf)) return false;
-            let sum = 0, remainder;
-            for (let i = 1; i <= 9; i++) sum = sum + parseInt(cpf.substring(i-1, i)) * (11 - i);
-            remainder = (sum * 10) % 11;
-            if (remainder === 10 || remainder === 11) remainder = 0;
-            if (remainder !== parseInt(cpf.substring(9, 10))) return false;
-            sum = 0;
-            for (let i = 1; i <= 10; i++) sum = sum + parseInt(cpf.substring(i-1, i)) * (12 - i);
-            remainder = (sum * 10) % 11;
-            if (remainder === 10 || remainder === 11) remainder = 0;
-            return remainder === parseInt(cpf.substring(10, 11));
-        }
-
-        function validateCNPJ(cnpj) {
-            if (/^(\d)\1+$/.test(cnpj)) return false;
-            const calc = (x) => {
-                const slice = cnpj.substring(0, x);
-                let sum = 0, pos = x - 7;
-                for (let i = x; i >= 1; i--) {
-                    sum += slice.charAt(x - i) * pos--;
-                    if (pos < 2) pos = 9;
-                }
-                return sum % 11 < 2 ? 0 : 11 - sum % 11;
-            };
-            return calc(12) === parseInt(cnpj.charAt(12)) && calc(13) === parseInt(cnpj.charAt(13));
-        }
-
-        // --- 测试工具 ---
-        function fillRandom(type) {
-            const rnd = (n) => Math.round(Math.random() * n);
-            const mod = (a, b) => Math.round(a - (Math.floor(a / b) * b));
-            if (type === 'cpf') {
-                const n = Array.from({length: 9}, () => rnd(9));
-                let d1 = n.reduce((acc, curr, i) => acc + curr * (10-i), 0);
-                d1 = 11 - mod(d1, 11); if (d1 >= 10) d1 = 0;
-                let d2 = n.reduce((acc, curr, i) => acc + curr * (11-i), 0) + d1*2;
-                d2 = 11 - mod(d2, 11); if (d2 >= 10) d2 = 0;
-                const val = n.join('') + d1 + d2;
-                input.value = applyMask(val, false);
-                validateAndRender(val, false);
-            } else {
-                const n = Array.from({length: 8}, () => rnd(9));
-                const b = [0,0,0,1]; // 0001
-                const base = [...n, ...b];
-                const calcD = (arr, startW) => {
-                    let s = 0;
-                    let w = startW;
-                    for(let i=0; i < arr.length; i++) {
-                        s += arr[i] * w;
-                        w--;
-                        if(w < 2) w = 9;
-                    }
-                    const r = s % 11;
-                    return r < 2 ? 0 : 11 - r;
-                };
-                const d1 = calcD(base, 5);
-                const d2 = calcD([...base, d1], 6);
-                const val = base.join('') + d1 + d2;
-                input.value = applyMask(val, true);
-                validateAndRender(val, true);
-            }
-        }
+        // 【可选】如果你发现无法唤起，可能是因为特殊字符问题
+        // 某些浏览器对 URL 中的 '#' 处理敏感，可能需要把 '#' 替换为 '%23'
+        // 如果上面的 rawUrl 不行，请尝试打开下面这行注释：
+        // linkBtn.href = rawUrl.replace(/#/g, '%23');
     </script>
 </body>
 </html>
