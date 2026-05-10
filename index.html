@@ -493,6 +493,20 @@
       margin-bottom: 18px;
     }
 
+    .compact-field {
+      margin-bottom: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .field-help {
+      color: var(--quiet);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     label,
     .label {
       color: #293241;
@@ -1032,7 +1046,7 @@
                 <td class="center"><span class="check">✓</span></td>
                 <td class="center"><span class="check">✓</span></td>
                 <td class="center"></td>
-                <td>由 Hdata 主动事件驱动生效和失效，替代定时 job。</td>
+                <td>由 Hdata 主动事件驱动生效和失效，处罚动作可为暂时下架或对客隐藏。</td>
               </tr>
               <tr>
                 <td>价格预警处罚</td>
@@ -1040,7 +1054,7 @@
                 <td class="center"><span class="check">✓</span></td>
                 <td class="center"><span class="check">✓</span></td>
                 <td class="center"></td>
-                <td>本期新增，同时可驱动暂时下架和对客隐藏，最终按强度收敛。</td>
+                <td>本期新增，处罚动作可为暂时下架或对客隐藏，最终按强度收敛。</td>
               </tr>
               <tr>
                 <td>手工调整</td>
@@ -1092,14 +1106,26 @@
                   <input id="infoMissing" type="checkbox">
                   <span><b>必填信息缺失</b><small>信息不完整时，演示按对客隐藏处理</small></span>
                 </label>
-                <label class="toggle">
-                  <input id="otaPenalty" type="checkbox">
-                  <span><b>违规 OTA 惩罚期</b><small>由 Hdata 事件驱动生效/失效</small></span>
-                </label>
-                <label class="toggle">
-                  <input id="pricePenalty" type="checkbox">
-                  <span><b>价格预警处罚</b><small>同时命中暂时下架和对客隐藏</small></span>
-                </label>
+                <div class="compact-field">
+                  <label for="otaPenaltyMode">违规 OTA 惩罚期</label>
+                  <select id="otaPenaltyMode">
+                    <option value="none">无处罚</option>
+                    <option value="temp">处罚动作：暂时下架</option>
+                    <option value="hidden">处罚动作：对客隐藏</option>
+                    <option value="both">同时命中两种动作</option>
+                  </select>
+                  <span class="field-help">同一处罚类型可由上游传入不同处罚动作。</span>
+                </div>
+                <div class="compact-field">
+                  <label for="pricePenaltyMode">价格预警处罚</label>
+                  <select id="pricePenaltyMode">
+                    <option value="none">无处罚</option>
+                    <option value="temp">处罚动作：暂时下架</option>
+                    <option value="hidden">处罚动作：对客隐藏</option>
+                    <option value="both">同时命中两种动作</option>
+                  </select>
+                  <span class="field-help">价格预警也支持暂时下架或对客隐藏。</span>
+                </div>
               </div>
             </div>
 
@@ -1145,7 +1171,7 @@
                 </div>
                 <div class="metric">
                   <span>命中候选</span>
-                  <b id="sourceCount">1 个条件</b>
+                  <b id="sourceCount">1 个候选状态</b>
                 </div>
               </div>
             </div>
@@ -1185,7 +1211,7 @@
           </div>
           <div class="op-step">
             <b>转换为驱动条件</b>
-            <p>不要直接写最终状态，先统一转换成“经营状态=营建期”“价格预警处罚=生效”等条件。</p>
+            <p>不要直接写最终状态，先统一转换成“经营状态=营建期”“价格预警处罚=暂时下架”“OTA惩罚=对客隐藏”等条件。</p>
           </div>
           <div class="op-step">
             <b>匹配矩阵规则</b>
@@ -1249,8 +1275,8 @@
       virtualHotel: document.querySelector("#virtualHotel"),
       staffApartment: document.querySelector("#staffApartment"),
       infoMissing: document.querySelector("#infoMissing"),
-      otaPenalty: document.querySelector("#otaPenalty"),
-      pricePenalty: document.querySelector("#pricePenalty"),
+      otaPenaltyMode: document.querySelector("#otaPenaltyMode"),
+      pricePenaltyMode: document.querySelector("#pricePenaltyMode"),
       manualTarget: document.querySelector("#manualTarget")
     };
 
@@ -1266,6 +1292,15 @@
 
     function addCandidate(list, state, label, detail) {
       list.push({ state, label, detail, score: stateMeta[state].score });
+    }
+
+    function addPenaltyCandidates(list, mode, label) {
+      if (mode === "temp" || mode === "both") {
+        addCandidate(list, "temp", label, "处罚动作要求暂时下架，限制用户下单。");
+      }
+      if (mode === "hidden" || mode === "both") {
+        addCandidate(list, "hidden", label, "处罚动作要求对客隐藏，限制用户搜索。");
+      }
     }
 
     function collectCandidates() {
@@ -1297,13 +1332,8 @@
       if (controls.infoMissing.checked) {
         addCandidate(candidates, "hidden", "资料：必填信息缺失", "信息不完整时不应对客展示，因此驱动对客隐藏。");
       }
-      if (controls.otaPenalty.checked) {
-        addCandidate(candidates, "hidden", "处罚：违规 OTA 惩罚期", "限制用户查找和下单，由 Hdata 事件驱动。");
-      }
-      if (controls.pricePenalty.checked) {
-        addCandidate(candidates, "temp", "处罚：价格预警处罚", "价格预警处罚可驱动暂时下架，限制用户下单。");
-        addCandidate(candidates, "hidden", "处罚：价格预警处罚", "价格预警处罚也可驱动对客隐藏，限制用户搜索。");
-      }
+      addPenaltyCandidates(candidates, controls.otaPenaltyMode.value, "处罚：违规 OTA 惩罚期");
+      addPenaltyCandidates(candidates, controls.pricePenaltyMode.value, "处罚：价格预警处罚");
 
       const manual = controls.manualTarget.value;
       if (manual !== "none") {
@@ -1374,18 +1404,18 @@
       controls.virtualHotel.checked = false;
       controls.staffApartment.checked = false;
       controls.infoMissing.checked = false;
-      controls.otaPenalty.checked = false;
-      controls.pricePenalty.checked = false;
+      controls.otaPenaltyMode.value = "none";
+      controls.pricePenaltyMode.value = "none";
       controls.manualTarget.value = "none";
 
       if (name === "virtual") {
         controls.virtualHotel.checked = true;
       }
       if (name === "penalty") {
-        controls.pricePenalty.checked = true;
+        controls.pricePenaltyMode.value = "both";
       }
       if (name === "manualConflict") {
-        controls.pricePenalty.checked = true;
+        controls.pricePenaltyMode.value = "temp";
         controls.manualTarget.value = "online";
       }
       if (name === "closed") {
