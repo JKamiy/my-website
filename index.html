@@ -1159,8 +1159,8 @@
                 <h4>冲突收敛规则</h4>
                 <ul class="logic-list">
                   <li><span class="rank">4</span><span><span class="state-pill state-closed">下架关闭</span> 最高强度，用于永久停业、营建终止或手工关闭。</span></li>
-                  <li><span class="rank">3</span><span><span class="state-pill state-hidden">对客隐藏</span> 不让用户查到，适合虚拟酒店、员工公寓等。</span></li>
-                  <li><span class="rank">2</span><span><span class="state-pill state-temp">暂时下架</span> 暂时不可售卖，适合营建期、临停、处罚等。</span></li>
+                  <li><span class="rank">3</span><span><span class="state-pill state-temp">暂时下架</span> 暂时不可售卖，适合营建期、临停、处罚等。</span></li>
+                  <li><span class="rank">2</span><span><span class="state-pill state-hidden">对客隐藏</span> 不让用户查到，适合虚拟酒店、员工公寓等。</span></li>
                   <li><span class="rank">1</span><span><span class="state-pill state-online">正常在线</span> 无限制条件时的默认输出。</span></li>
                 </ul>
               </div>
@@ -1220,7 +1220,7 @@
       },
       temp: {
         name: "暂时下架",
-        score: 2,
+        score: 3,
         pillClass: "state-temp",
         searchable: false,
         bookable: false,
@@ -1228,7 +1228,7 @@
       },
       hidden: {
         name: "对客隐藏",
-        score: 3,
+        score: 2,
         pillClass: "state-hidden",
         searchable: false,
         bookable: false,
