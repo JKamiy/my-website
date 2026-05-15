@@ -1,33 +1,15 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>酒店官方渠道状态结构调整演示</title>
+  <title>Revolut Link Test</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f6f8;
-      --surface: #ffffff;
-      --surface-soft: #f8fafc;
-      --line: #dde3ea;
-      --line-strong: #c9d2dd;
-      --text: #172033;
-      --muted: #5d6b7c;
-      --quiet: #8290a1;
-      --blue: #1769e0;
-      --blue-soft: #eaf2ff;
-      --green: #087f5b;
-      --green-soft: #e8f7f1;
-      --amber: #a65f00;
-      --amber-soft: #fff4df;
-      --red: #c4312f;
-      --red-soft: #fff0ed;
-      --violet: #6b4fd8;
-      --violet-soft: #f0edff;
-      --shadow: 0 14px 38px rgba(25, 35, 55, 0.10);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f6f7f9;
+      color: #1f2933;
     }
 
     * {
@@ -36,1403 +18,312 @@
 
     body {
       margin: 0;
-      color: var(--text);
-      background: var(--bg);
-      letter-spacing: 0;
-    }
-
-    button,
-    select {
-      font: inherit;
-      letter-spacing: 0;
-    }
-
-    .page {
       min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
 
-    .hero {
-      padding: 34px 28px 24px;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.76)),
-        repeating-linear-gradient(90deg, #edf2f7 0 1px, transparent 1px 96px),
-        repeating-linear-gradient(0deg, #edf2f7 0 1px, transparent 1px 72px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .hero-inner,
-    .content {
-      width: min(1360px, calc(100vw - 48px));
-      margin: 0 auto;
-    }
-
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 22px;
-    }
-
-    .eyebrow {
-      margin: 0 0 8px;
-      color: var(--blue);
-      font-size: 13px;
-      line-height: 18px;
-      font-weight: 800;
+    main {
+      width: min(920px, 100%);
+      background: #ffffff;
+      border: 1px solid #d9dee7;
+      border-radius: 8px;
+      box-shadow: 0 18px 45px rgba(24, 39, 75, 0.08);
+      padding: 24px;
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(26px, 4vw, 42px);
-      line-height: 1.18;
-      font-weight: 820;
-    }
-
-    .lead {
-      max-width: 920px;
-      margin: 14px 0 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.7;
-    }
-
-    .meeting {
-      min-width: 236px;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.92);
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.55;
-    }
-
-    .meeting strong {
-      display: block;
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .principle-strip {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 28px;
-    }
-
-    .principle {
-      min-height: 112px;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface);
-      box-shadow: 0 8px 22px rgba(25, 35, 55, 0.06);
-    }
-
-    .principle b {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 15px;
-      line-height: 1.35;
-    }
-
-    .principle p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.65;
-    }
-
-    .content {
-      display: grid;
-      gap: 24px;
-      padding: 24px 0 36px;
-    }
-
-    .band {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .band-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--line);
-      background: var(--surface-soft);
-    }
-
-    .band-head h2 {
-      margin: 0;
-      font-size: 20px;
-      line-height: 1.35;
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.25;
       letter-spacing: 0;
     }
 
-    .band-head p {
-      max-width: 780px;
-      margin: 5px 0 0;
-      color: var(--muted);
+    .lead {
+      margin: 0 0 18px;
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.5;
+      color: #697586;
     }
 
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-size: 12px;
-      line-height: 18px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .compare {
+    .grid {
       display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: 1px;
-      background: var(--line);
-    }
-
-    .compare-panel {
-      padding: 20px;
-      background: var(--surface);
-      min-width: 0;
-    }
-
-    .compare-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .compare-title h3 {
-      margin: 0;
-      font-size: 17px;
-      line-height: 1.35;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 24px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      line-height: 16px;
-      font-weight: 800;
-    }
-
-    .badge.bad {
-      color: var(--red);
-      background: var(--red-soft);
-    }
-
-    .badge.good {
-      color: var(--green);
-      background: var(--green-soft);
-    }
-
-    .old-grid {
-      display: grid;
-      grid-template-columns: 132px repeat(3, minmax(100px, 1fr));
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      font-size: 12px;
-    }
-
-    .old-cell {
-      min-height: 58px;
-      padding: 10px;
-      border-right: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      background: #fff;
-      line-height: 1.45;
-    }
-
-    .old-cell:nth-child(4n) {
-      border-right: 0;
-    }
-
-    .old-cell.head {
-      background: #eef2f6;
-      color: #293241;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    .old-cell.row {
-      font-weight: 800;
-      background: #f8fafc;
-    }
-
-    .old-cell.problem {
-      color: var(--red);
-      background: var(--red-soft);
-    }
-
-    .notes {
-      display: grid;
-      gap: 10px;
-      margin: 14px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .notes li {
-      display: grid;
-      grid-template-columns: 22px minmax(0, 1fr);
-      gap: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .mark {
-      width: 22px;
-      height: 22px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 12px;
-      font-weight: 900;
-      background: var(--red);
-    }
-
-    .mark.ok {
-      background: var(--green);
-    }
-
-    .model {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      align-items: stretch;
-    }
-
-    .model-step {
-      position: relative;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface-soft);
-      min-height: 132px;
-    }
-
-    .model-step:not(:last-child)::after {
-      content: "→";
-      position: absolute;
-      top: 50%;
-      right: -18px;
-      z-index: 2;
-      width: 26px;
-      height: 26px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--blue);
-      color: #fff;
-      font-weight: 900;
-      transform: translateY(-50%);
-    }
-
-    .model-step span {
-      display: inline-grid;
-      place-items: center;
-      width: 28px;
-      height: 28px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      color: #fff;
-      background: var(--blue);
-      font-weight: 900;
-    }
-
-    .model-step h4 {
-      margin: 0 0 7px;
-      font-size: 15px;
-      line-height: 1.35;
-    }
-
-    .model-step p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .matrix-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 960px;
-    }
-
-    th,
-    td {
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--line);
-      border-right: 1px solid var(--line);
-      vertical-align: middle;
-      text-align: left;
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: #eef2f6;
-      color: #293241;
-      font-weight: 850;
-    }
-
-    td:last-child,
-    th:last-child {
-      border-right: 0;
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .center {
-      text-align: center;
-    }
-
-    .check {
-      display: inline-grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--green-soft);
-      color: var(--green);
-      font-weight: 950;
-    }
-
-    .maybe {
-      display: inline-flex;
-      align-items: center;
-      min-height: 22px;
-      padding: 2px 7px;
-      border-radius: 4px;
-      background: var(--amber-soft);
-      color: var(--amber);
-      font-weight: 850;
-      font-size: 12px;
-    }
-
-    .state-pill {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      line-height: 18px;
-      font-weight: 850;
-      white-space: nowrap;
-    }
-
-    .state-online {
-      color: var(--green);
-      background: var(--green-soft);
-    }
-
-    .state-temp {
-      color: var(--amber);
-      background: var(--amber-soft);
-    }
-
-    .state-hidden {
-      color: var(--violet);
-      background: var(--violet-soft);
-    }
-
-    .state-closed {
-      color: var(--red);
-      background: var(--red-soft);
-    }
-
-    .simulator {
-      display: grid;
-      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
-      gap: 1px;
-      background: var(--line);
-    }
-
-    .control-panel,
-    .result-panel {
-      background: var(--surface);
-      padding: 20px;
-      min-width: 0;
-    }
-
-    .field {
-      display: grid;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-
-    .compact-field {
-      margin-bottom: 0;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface-soft);
-    }
-
-    .field-help {
-      color: var(--quiet);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    label,
-    .label {
-      color: #293241;
-      font-size: 13px;
-      line-height: 1.4;
-      font-weight: 850;
-    }
-
-    select {
-      width: 100%;
-      min-height: 42px;
-      padding: 8px 10px;
-      border: 1px solid var(--line-strong);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--text);
-      outline: none;
-    }
-
-    select:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.14);
-    }
-
-    .toggle-grid {
-      display: grid;
-      gap: 8px;
-    }
-
-    .toggle {
-      min-height: 46px;
-      display: grid;
-      grid-template-columns: 20px minmax(0, 1fr);
-      gap: 10px;
-      align-items: center;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface-soft);
-      cursor: pointer;
-    }
-
-    .toggle:hover {
-      border-color: var(--line-strong);
-      background: #fff;
-    }
-
-    .toggle input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--blue);
-    }
-
-    .toggle b {
-      display: block;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .toggle small {
-      display: block;
-      margin-top: 2px;
-      color: var(--quiet);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .preset-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .preset {
-      min-height: 32px;
-      padding: 6px 10px;
-      border: 1px solid var(--line-strong);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--text);
-      font-size: 12px;
-      line-height: 16px;
-      font-weight: 750;
-      cursor: pointer;
-    }
-
-    .preset:hover {
-      border-color: var(--blue);
-      color: var(--blue);
-      background: var(--blue-soft);
-    }
-
-    .result-hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
-      gap: 18px;
-      align-items: stretch;
-      margin-bottom: 18px;
-    }
-
-    .final-state {
-      min-height: 178px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface-soft);
-    }
-
-    .final-state h3 {
-      margin: 0;
-      font-size: 14px;
-      line-height: 1.4;
-      color: var(--muted);
-    }
-
-    .state-name {
-      margin: 10px 0 0;
-      font-size: clamp(28px, 5vw, 46px);
-      line-height: 1.05;
-      font-weight: 900;
-    }
-
-    .state-reason {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.65;
-    }
-
-    .customer-view {
-      display: grid;
-      gap: 10px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .metric {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: center;
-      min-height: 42px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .metric:last-child {
-      border-bottom: 0;
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .metric b {
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .yes {
-      color: var(--green);
-    }
-
-    .no {
-      color: var(--red);
-    }
-
-    .explain-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
     }
 
-    .logic-box {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    .logic-box h4 {
-      margin: 0;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
-      background: var(--surface-soft);
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .logic-list {
+    label {
       display: grid;
-      gap: 8px;
-      margin: 0;
-      padding: 14px;
-      list-style: none;
-    }
-
-    .logic-list li {
-      display: grid;
-      grid-template-columns: 24px minmax(0, 1fr);
-      gap: 9px;
-      align-items: start;
-      color: var(--muted);
+      gap: 6px;
       font-size: 13px;
-      line-height: 1.55;
+      color: #52606d;
     }
 
-    .rank {
-      width: 24px;
-      height: 24px;
-      display: grid;
-      place-items: center;
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd2dc;
       border-radius: 6px;
-      color: #fff;
-      background: var(--blue);
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    .matched {
-      color: var(--text);
-      font-weight: 760;
-    }
-
-    .empty {
-      color: var(--quiet);
-    }
-
-    .operation {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 10px;
-      padding: 20px;
-    }
-
-    .op-step {
-      position: relative;
-      min-height: 138px;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface-soft);
-    }
-
-    .op-step:not(:last-child)::after {
-      content: "→";
-      position: absolute;
-      right: -18px;
-      top: 48px;
-      z-index: 2;
-      width: 26px;
-      height: 26px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: #293241;
-      color: #fff;
-      font-weight: 900;
-    }
-
-    .op-step b {
-      display: block;
-      margin-bottom: 8px;
+      padding: 10px 11px;
+      font: inherit;
       font-size: 14px;
-      line-height: 1.35;
+      color: #1f2933;
+      background: #ffffff;
     }
 
-    .op-step p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      overflow-wrap: anywhere;
     }
 
-    .footer-note {
-      padding: 16px 20px;
-      border-top: 1px solid var(--line);
-      background: var(--surface-soft);
-      color: var(--muted);
+    .wide {
+      grid-column: 1 / -1;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      color: #ffffff;
+      background: #1455d9;
+    }
+
+    button.secondary {
+      background: #111827;
+    }
+
+    button.ghost {
+      color: #1f2933;
+      background: #e9edf4;
+    }
+
+    .output {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .hint {
+      margin-top: 14px;
       font-size: 13px;
-      line-height: 1.7;
+      line-height: 1.5;
+      color: #697586;
     }
 
-    @media (max-width: 980px) {
-      .hero-top,
-      .compare,
-      .simulator,
-      .result-hero,
-      .explain-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-top {
-        display: grid;
-      }
-
-      .principle-strip,
-      .model,
-      .operation {
-        grid-template-columns: 1fr;
-      }
-
-      .model-step:not(:last-child)::after,
-      .op-step:not(:last-child)::after {
-        display: none;
-      }
-
-      .meeting {
-        min-width: 0;
-      }
+    .status {
+      margin-top: 14px;
+      border: 1px solid #d9dee7;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #394452;
+      background: #fbfcfe;
     }
 
-    @media (max-width: 640px) {
-      .hero-inner,
-      .content {
-        width: min(100vw - 28px, 1360px);
+    @media (max-width: 720px) {
+      main {
+        padding: 18px;
       }
 
-      .hero {
-        padding: 24px 14px 18px;
-      }
-
-      .content {
-        padding: 14px 0 24px;
-      }
-
-      .band-head {
-        display: grid;
-      }
-
-      .old-grid {
-        grid-template-columns: 112px repeat(3, minmax(88px, 1fr));
-        overflow-x: auto;
+      .grid,
+      .actions {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <div class="hero-inner">
-        <div class="hero-top">
-          <div>
-            <p class="eyebrow">酒店官方渠道状态 · 结构调整演示</p>
-            <h1>从“二维枚举表”改成“条件驱动状态机”</h1>
-            <p class="lead">这次调整的关键不是多加一列“价格预警惩罚”，而是把经营状态、业务属性、处罚事件、手工调整放到同一套驱动模型里。最终状态由命中的条件计算出来，而不是靠手工和系统互相覆盖。</p>
-          </div>
-          <aside class="meeting">
-            <strong>依据会议</strong>
-            Granola：酒店状态需求更新<br>
-            时间：2026-05-10 13:57<br>
-            结论：手工调整也是驱动条件之一
-          </aside>
-        </div>
+  <main>
+    <h1>Revolut Link Test</h1>
+    <p class="lead">
+      Prefilled with Revolut documentation sample values. For a real payment test, replace the token and public key with your merchant values.
+    </p>
 
-        <div class="principle-strip">
-          <div class="principle">
-            <b>状态是结果</b>
-            <p>“正常在线、暂时下架、对客隐藏、下架关闭”是最终输出，不再和虚拟酒店、员工公寓、处罚期并列。</p>
-          </div>
-          <div class="principle">
-            <b>条件是输入</b>
-            <p>经营状态、酒店属性、资料完整性、处罚事件、手工调整都统一作为驱动条件进入规则引擎。</p>
-          </div>
-          <div class="principle">
-            <b>冲突靠规则收敛</b>
-            <p>多个条件同时命中时，按管控强度计算最终状态，避免“系统推不回去”或“手工压住系统”的不对称问题。</p>
-          </div>
-        </div>
-      </div>
+    <section class="grid" aria-label="Link inputs">
+      <label>
+        Order token
+        <input id="orderToken" value="0adc0e3c-ab44-4f33-bcc0-534ded7354ce">
+      </label>
+
+      <label>
+        Merchant public key
+        <input id="publicKey" value="PASTE_YOUR_REAL_MERCHANT_PUBLIC_KEY">
+      </label>
+
+      <label class="wide">
+        Checkout URL
+        <input id="checkoutUrl" value="https://checkout.revolut.com/payment-link/0adc0e3c-ab44-4f33-bcc0-534ded7354ce">
+      </label>
+
+      <label>
+        Return URL
+        <input id="returnUrl" value="https://www.example.com/redirect">
+      </label>
+
+      <label>
+        Success URL
+        <input id="successUrl" value="https://www.example.com/revolut/success">
+      </label>
+
+      <label>
+        Failure URL
+        <input id="failureUrl" value="https://www.example.com/revolut/failure">
+      </label>
+
+      <label>
+        Cancel URL
+        <input id="cancelUrl" value="https://www.example.com/revolut/cancel">
+      </label>
+
+      <label>
+        Locale
+        <input id="locale" value="en">
+      </label>
+
+      <label>
+        Mobile browser
+        <input id="mobileBrowser" value="Safari">
+      </label>
     </section>
 
-    <div class="content">
-      <section class="band">
-        <div class="band-head">
-          <div>
-            <h2>1. 结构改动：把横向业务状态拆成驱动条件</h2>
-            <p>原表适合表达少量固定组合，但价格预警、OTA惩罚、虚拟酒店、员工公寓、手工调整同时存在时，会变成组合爆炸。新结构把“条件”和“状态”分离。</p>
-          </div>
-          <span class="tag">推荐改法</span>
-        </div>
+    <section class="actions" aria-label="Open links">
+      <button id="openCheckout" type="button">Open checkout_url</button>
+      <button id="openUniversal" class="secondary" type="button">Open universal link</button>
+      <button id="fillDocsSample" class="ghost" type="button">Fill docs sample</button>
+      <button id="fillFromCheckout" class="ghost" type="button">Extract token from checkout_url</button>
+    </section>
 
-        <div class="compare">
-          <div class="compare-panel">
-            <div class="compare-title">
-              <h3>原结构：经营状态 × 业务状态</h3>
-              <span class="badge bad">容易失真</span>
-            </div>
-            <div class="old-grid" aria-label="原结构示意表">
-              <div class="old-cell head">经营状态</div>
-              <div class="old-cell head">默认状态</div>
-              <div class="old-cell head">虚拟酒店</div>
-              <div class="old-cell head">价格预警</div>
-              <div class="old-cell row">运营期</div>
-              <div class="old-cell">正常在线</div>
-              <div class="old-cell">对客隐藏</div>
-              <div class="old-cell problem">根据上游传入</div>
-              <div class="old-cell row">营建期</div>
-              <div class="old-cell">暂时下架</div>
-              <div class="old-cell">暂时下架</div>
-              <div class="old-cell">暂时下架</div>
-              <div class="old-cell row">永久停业</div>
-              <div class="old-cell">下架关闭</div>
-              <div class="old-cell">下架关闭</div>
-              <div class="old-cell">下架关闭</div>
-            </div>
-            <ul class="notes">
-              <li><span class="mark">!</span><span>虚拟酒店、员工公寓是酒店属性，不是“业务状态”。</span></li>
-              <li><span class="mark">!</span><span>处罚期是事件驱动条件，不适合写成静态列。</span></li>
-              <li><span class="mark">!</span><span>手工调整在原表里没有位置，只能靠额外优先级解释。</span></li>
-            </ul>
-          </div>
+    <section class="output" aria-label="Generated links">
+      <label>
+        Generated universal link
+        <textarea id="universalOutput" readonly></textarea>
+      </label>
+    </section>
 
-          <div class="compare-panel">
-            <div class="compare-title">
-              <h3>新结构：条件驱动状态机</h3>
-              <span class="badge good">可扩展</span>
-            </div>
-            <div class="model" aria-label="新结构模型">
-              <div class="model-step">
-                <span>1</span>
-                <h4>采集条件</h4>
-                <p>经营状态、属性、资料、处罚事件、人工操作都进入同一条件池。</p>
-              </div>
-              <div class="model-step">
-                <span>2</span>
-                <h4>生成候选状态</h4>
-                <p>每个条件只声明自己能驱动哪些状态，不直接覆盖最终结果。</p>
-              </div>
-              <div class="model-step">
-                <span>3</span>
-                <h4>冲突收敛</h4>
-                <p>按管控强度和业务规则选择最终官方渠道状态。</p>
-              </div>
-              <div class="model-step">
-                <span>4</span>
-                <h4>事件同步</h4>
-                <p>状态变化后推送下游，处罚生效和失效由 Hdata 事件驱动。</p>
-              </div>
-            </div>
-            <ul class="notes">
-              <li><span class="mark ok">✓</span><span>新增一个业务条件时，只需要加一行规则，不需要扩充所有组合列。</span></li>
-              <li><span class="mark ok">✓</span><span>手工调整和系统条件被打平，不再出现优先级不对称。</span></li>
-              <li><span class="mark ok">✓</span><span>评审时能直接说明“为什么这个条件会得到这个状态”。</span></li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="band">
-        <div class="band-head">
-          <div>
-            <h2>2. 建议放进 PRD 的状态 × 驱动条件矩阵</h2>
-            <p>每个勾表示该条件可以产生对应候选状态；最终状态还要经过冲突规则收敛。一个驱动条件可以同时产生多个候选状态，再由收敛规则选出最终结果。</p>
-          </div>
-          <span class="tag">PRD 表格</span>
-        </div>
-        <div class="matrix-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>驱动条件</th>
-                <th class="center">正常在线</th>
-                <th class="center">暂时下架</th>
-                <th class="center">对客隐藏</th>
-                <th class="center">下架关闭</th>
-                <th>说明</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>经营状态 = 运营期 / 营业中</td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td>默认可在官方渠道展示和售卖。</td>
-              </tr>
-              <tr>
-                <td>经营状态 = 营建期</td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td>酒店还未进入营业，暂时不可售卖。</td>
-              </tr>
-              <tr>
-                <td>经营状态 = 临时停业</td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td>可恢复经营，因此不直接进入关闭。</td>
-              </tr>
-              <tr>
-                <td>经营状态 = 营建终止 / 永久停业</td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td>不可继续售卖，输出关闭状态。</td>
-              </tr>
-              <tr>
-                <td>虚拟酒店属性</td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"><span class="maybe">手工可选</span></td>
-                <td>虚拟酒店不是状态，营业中也应对客隐藏。</td>
-              </tr>
-              <tr>
-                <td>员工公寓属性</td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"><span class="maybe">手工可选</span></td>
-                <td>与虚拟酒店类似，属于属性条件。</td>
-              </tr>
-              <tr>
-                <td>必填信息缺失</td>
-                <td class="center"></td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"></td>
-                <td>必填信息不完整时，不应对客展示。</td>
-              </tr>
-              <tr>
-                <td>违规开通线下 OTA 合作惩罚期</td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"></td>
-                <td>由 Hdata 主动事件驱动生效和失效，处罚动作可为暂时下架或对客隐藏。</td>
-              </tr>
-              <tr>
-                <td>价格预警处罚</td>
-                <td class="center"></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"></td>
-                <td>本期新增，处罚动作可为暂时下架或对客隐藏，最终按强度收敛。</td>
-              </tr>
-              <tr>
-                <td>手工调整</td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td class="center"><span class="check">✓</span></td>
-                <td>手工是驱动条件之一，不再拥有特殊优先级。</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="band">
-        <div class="band-head">
-          <div>
-            <h2>3. 交互演示：条件变化如何算出最终状态</h2>
-            <p>左侧模拟输入条件，右侧展示命中的候选状态、冲突收敛结果、对客搜索和下单影响。这个模块可以用来给研发或业务解释“为什么不是再加一列”。</p>
-          </div>
-          <span class="tag">可点击演示</span>
-        </div>
-
-        <div class="simulator">
-          <div class="control-panel">
-            <div class="field">
-              <label for="operationStatus">酒店经营状态</label>
-              <select id="operationStatus">
-                <option value="operating">运营期 / 营业中</option>
-                <option value="building">营建期</option>
-                <option value="tempStop">临时停业</option>
-                <option value="buildEnd">营建终止</option>
-                <option value="permStop">永久停业</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <div class="label">业务属性与处罚条件</div>
-              <div class="toggle-grid">
-                <label class="toggle">
-                  <input id="virtualHotel" type="checkbox">
-                  <span><b>虚拟酒店</b><small>营业中也不应被用户查到</small></span>
-                </label>
-                <label class="toggle">
-                  <input id="staffApartment" type="checkbox">
-                  <span><b>员工公寓</b><small>属于酒店属性条件</small></span>
-                </label>
-                <label class="toggle">
-                  <input id="infoMissing" type="checkbox">
-                  <span><b>必填信息缺失</b><small>信息不完整时，演示按对客隐藏处理</small></span>
-                </label>
-                <div class="compact-field">
-                  <label for="otaPenaltyMode">违规 OTA 惩罚期</label>
-                  <select id="otaPenaltyMode">
-                    <option value="none">无处罚</option>
-                    <option value="temp">处罚动作：暂时下架</option>
-                    <option value="hidden">处罚动作：对客隐藏</option>
-                    <option value="both">同时命中两种动作</option>
-                  </select>
-                  <span class="field-help">同一处罚类型可由上游传入不同处罚动作。</span>
-                </div>
-                <div class="compact-field">
-                  <label for="pricePenaltyMode">价格预警处罚</label>
-                  <select id="pricePenaltyMode">
-                    <option value="none">无处罚</option>
-                    <option value="temp">处罚动作：暂时下架</option>
-                    <option value="hidden">处罚动作：对客隐藏</option>
-                    <option value="both">同时命中两种动作</option>
-                  </select>
-                  <span class="field-help">价格预警也支持暂时下架或对客隐藏。</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="manualTarget">手工调整目标</label>
-              <select id="manualTarget">
-                <option value="none">无手工调整</option>
-                <option value="online">手工调整为正常在线</option>
-                <option value="temp">手工调整为暂时下架</option>
-                <option value="hidden">手工调整为对客隐藏</option>
-                <option value="closed">手工调整为下架关闭</option>
-              </select>
-            </div>
-
-            <div class="preset-row" aria-label="演示场景">
-              <button class="preset" data-preset="normal">普通营业酒店</button>
-              <button class="preset" data-preset="virtual">虚拟酒店</button>
-              <button class="preset" data-preset="penalty">价格预警处罚</button>
-              <button class="preset" data-preset="manualConflict">手工与处罚冲突</button>
-              <button class="preset" data-preset="closed">永久停业</button>
-            </div>
-          </div>
-
-          <div class="result-panel">
-            <div class="result-hero">
-              <div class="final-state">
-                <div>
-                  <h3>最终官方渠道酒店状态</h3>
-                  <div id="stateName" class="state-name">正常在线</div>
-                  <p id="stateReason" class="state-reason">运营期默认驱动为正常在线。</p>
-                </div>
-                <div id="statePill" class="state-pill state-online">管控强度：1 / 4</div>
-              </div>
-
-              <div class="customer-view">
-                <div class="metric">
-                  <span>用户是否可搜索</span>
-                  <b id="searchable" class="yes">是</b>
-                </div>
-                <div class="metric">
-                  <span>用户是否可下单</span>
-                  <b id="bookable" class="yes">是</b>
-                </div>
-                <div class="metric">
-                  <span>命中候选</span>
-                  <b id="sourceCount">1 个候选状态</b>
-                </div>
-              </div>
-            </div>
-
-            <div class="explain-grid">
-              <div class="logic-box">
-                <h4>命中的候选状态</h4>
-                <ul id="matchedList" class="logic-list"></ul>
-              </div>
-              <div class="logic-box">
-                <h4>冲突收敛规则</h4>
-                <ul class="logic-list">
-                  <li><span class="rank">4</span><span><span class="state-pill state-closed">下架关闭</span> 最高强度，用于永久停业、营建终止或手工关闭。</span></li>
-                  <li><span class="rank">3</span><span><span class="state-pill state-temp">暂时下架</span> 暂时不可售卖，适合营建期、临停、处罚等。</span></li>
-                  <li><span class="rank">2</span><span><span class="state-pill state-hidden">对客隐藏</span> 不让用户查到，适合虚拟酒店、员工公寓等。</span></li>
-                  <li><span class="rank">1</span><span><span class="state-pill state-online">正常在线</span> 无限制条件时的默认输出。</span></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="band">
-        <div class="band-head">
-          <div>
-            <h2>4. 操作方式：PRD 和系统实现都按这条链路写</h2>
-            <p>文档里建议把“表结构”和“处理链路”分开写：表结构说明规则如何配置，处理链路说明事件来了以后系统如何落状态。</p>
-          </div>
-          <span class="tag">落地流程</span>
-        </div>
-
-        <div class="operation">
-          <div class="op-step">
-            <b>接收来源事件</b>
-            <p>MPM/PM 经营状态变化、Hdata 处罚生效/失效、资料完整性变化、人工操作都作为事件进入。</p>
-          </div>
-          <div class="op-step">
-            <b>转换为驱动条件</b>
-            <p>不要直接写最终状态，先统一转换成“经营状态=营建期”“价格预警处罚=暂时下架”“OTA惩罚=对客隐藏”等条件。</p>
-          </div>
-          <div class="op-step">
-            <b>匹配矩阵规则</b>
-            <p>每个条件按照矩阵生成候选状态，并记录状态来源，方便排查和向业务解释。</p>
-          </div>
-          <div class="op-step">
-            <b>按强度收敛</b>
-            <p>多个候选状态同时存在时，按管控强度得到最终官方渠道酒店状态。</p>
-          </div>
-          <div class="op-step">
-            <b>同步下游渠道</b>
-            <p>状态变化后通过事件同步到 APP、小程序及后续 CS 渠道层，避免定时 job 延迟。</p>
-          </div>
-        </div>
-
-        <div class="footer-note">
-          PRD 建议写法：先定义四个官方渠道状态，再给出“状态 × 驱动条件矩阵”，最后补一张“多条件冲突处理规则”。这样后续新增处罚或渠道管控时，只需要补驱动条件，不需要重画整张组合表。
-        </div>
-      </section>
-    </div>
+    <p class="hint">
+      Use the real order token from Create Order. The checkout_url path is the official no-SDK route; the universal link shape is for direct testing only.
+    </p>
+    <div id="status" class="status" role="status"></div>
   </main>
 
   <script>
-    const stateMeta = {
-      online: {
-        name: "正常在线",
-        score: 1,
-        pillClass: "state-online",
-        searchable: true,
-        bookable: true,
-        reason: "没有更强限制条件时，输出正常在线。"
-      },
-      temp: {
-        name: "暂时下架",
-        score: 3,
-        pillClass: "state-temp",
-        searchable: false,
-        bookable: false,
-        reason: "存在暂时不可售卖的条件，输出暂时下架。"
-      },
-      hidden: {
-        name: "对客隐藏",
-        score: 2,
-        pillClass: "state-hidden",
-        searchable: false,
-        bookable: false,
-        reason: "存在不应被用户查到的条件，输出对客隐藏。"
-      },
-      closed: {
-        name: "下架关闭",
-        score: 4,
-        pillClass: "state-closed",
-        searchable: false,
-        bookable: false,
-        reason: "存在关闭类条件，输出下架关闭。"
-      }
+    const $ = (id) => document.getElementById(id);
+    const docsSample = {
+      orderToken: "0adc0e3c-ab44-4f33-bcc0-534ded7354ce",
+      publicKey: "PASTE_YOUR_REAL_MERCHANT_PUBLIC_KEY",
+      checkoutUrl: "https://checkout.revolut.com/payment-link/0adc0e3c-ab44-4f33-bcc0-534ded7354ce",
+      returnUrl: "https://www.example.com/redirect",
+      successUrl: "https://www.example.com/revolut/success",
+      failureUrl: "https://www.example.com/revolut/failure",
+      cancelUrl: "https://www.example.com/revolut/cancel",
+      locale: "en",
+      mobileBrowser: "Safari"
     };
 
-    const controls = {
-      operationStatus: document.querySelector("#operationStatus"),
-      virtualHotel: document.querySelector("#virtualHotel"),
-      staffApartment: document.querySelector("#staffApartment"),
-      infoMissing: document.querySelector("#infoMissing"),
-      otaPenaltyMode: document.querySelector("#otaPenaltyMode"),
-      pricePenaltyMode: document.querySelector("#pricePenaltyMode"),
-      manualTarget: document.querySelector("#manualTarget")
-    };
-
-    const output = {
-      stateName: document.querySelector("#stateName"),
-      stateReason: document.querySelector("#stateReason"),
-      statePill: document.querySelector("#statePill"),
-      searchable: document.querySelector("#searchable"),
-      bookable: document.querySelector("#bookable"),
-      sourceCount: document.querySelector("#sourceCount"),
-      matchedList: document.querySelector("#matchedList")
-    };
-
-    function addCandidate(list, state, label, detail) {
-      list.push({ state, label, detail, score: stateMeta[state].score });
+    function encoded(value) {
+      return encodeURIComponent(value.trim());
     }
 
-    function addPenaltyCandidates(list, mode, label) {
-      if (mode === "temp" || mode === "both") {
-        addCandidate(list, "temp", label, "处罚动作要求暂时下架，限制用户下单。");
-      }
-      if (mode === "hidden" || mode === "both") {
-        addCandidate(list, "hidden", label, "处罚动作要求对客隐藏，限制用户搜索。");
-      }
+    function buildMobileReturnUrl() {
+      const url = new URL("https://merchant.revolut.com/page-revolut-pay-mobile-redirect.html");
+      url.searchParams.set("_ms_ru", $("successUrl").value.trim());
+      url.searchParams.set("_mf_ru", $("failureUrl").value.trim());
+      url.searchParams.set("_mc_ru", $("cancelUrl").value.trim());
+      url.searchParams.set("detectButton", "true");
+      return url.toString();
     }
 
-    function collectCandidates() {
-      const candidates = [];
-      const operation = controls.operationStatus.value;
-
-      if (operation === "operating") {
-        addCandidate(candidates, "online", "经营状态：运营期 / 营业中", "默认具备官方渠道上线基础。");
-      }
-      if (operation === "building") {
-        addCandidate(candidates, "temp", "经营状态：营建期", "酒店尚未营业，暂时不可售卖。");
-      }
-      if (operation === "tempStop") {
-        addCandidate(candidates, "temp", "经营状态：临时停业", "可恢复经营，暂时不可售卖。");
-      }
-      if (operation === "buildEnd") {
-        addCandidate(candidates, "closed", "经营状态：营建终止", "不再继续营建，进入关闭。");
-      }
-      if (operation === "permStop") {
-        addCandidate(candidates, "closed", "经营状态：永久停业", "不再经营，进入关闭。");
-      }
-
-      if (controls.virtualHotel.checked) {
-        addCandidate(candidates, "hidden", "属性：虚拟酒店", "营业中也不对客展示。");
-      }
-      if (controls.staffApartment.checked) {
-        addCandidate(candidates, "hidden", "属性：员工公寓", "员工公寓不作为普通可售酒店展示。");
-      }
-      if (controls.infoMissing.checked) {
-        addCandidate(candidates, "hidden", "资料：必填信息缺失", "信息不完整时不应对客展示，因此驱动对客隐藏。");
-      }
-      addPenaltyCandidates(candidates, controls.otaPenaltyMode.value, "处罚：违规 OTA 惩罚期");
-      addPenaltyCandidates(candidates, controls.pricePenaltyMode.value, "处罚：价格预警处罚");
-
-      const manual = controls.manualTarget.value;
-      if (manual !== "none") {
-        const labels = {
-          online: "手工调整：正常在线",
-          temp: "手工调整：暂时下架",
-          hidden: "手工调整：对客隐藏",
-          closed: "手工调整：下架关闭"
-        };
-        addCandidate(candidates, manual, labels[manual], "手工调整也是驱动条件之一，与系统条件一起参与收敛。");
-      }
-
-      return candidates;
+    function buildUniversalUrl() {
+      const url = new URL("https://merchant.revolut.com/page-revolut-pay.html");
+      url.searchParams.set("locale", $("locale").value.trim() || "en");
+      url.searchParams.set("orderToken", $("orderToken").value.trim());
+      url.searchParams.set("publicKey", $("publicKey").value.trim());
+      url.searchParams.set("returnUrl", $("returnUrl").value.trim());
+      url.searchParams.set("mobileBrowser", $("mobileBrowser").value.trim() || "Safari");
+      url.searchParams.set("mobileReturnUrl", buildMobileReturnUrl());
+      url.searchParams.set("tid", "");
+      url.searchParams.set("_ms_ru", $("successUrl").value.trim());
+      url.searchParams.set("_mf_ru", $("failureUrl").value.trim());
+      url.searchParams.set("_mc_ru", $("cancelUrl").value.trim());
+      return url.toString();
     }
 
-    function render() {
-      const candidates = collectCandidates();
-      const winner = candidates.reduce((current, item) => {
-        if (!current || item.score > current.score) {
-          return item;
+    function syncCheckoutUrl() {
+      const token = $("orderToken").value.trim();
+      if (!token || $("checkoutUrl").dataset.edited === "true") return;
+      $("checkoutUrl").value = `https://checkout.revolut.com/payment-link/${encoded(token)}`;
+    }
+
+    function renderUniversalUrl() {
+      $("universalOutput").value = buildUniversalUrl();
+      const hasRealPublicKey = !$("publicKey").value.includes("PASTE_");
+      $("status").textContent = hasRealPublicKey
+        ? "Ready to test. Checkout URL is the official no-SDK route; universal link uses the direct Revolut Pay URL shape."
+        : "Checkout button can test the hosted checkout URL shape. Universal link needs your real Merchant public key, otherwise Revolut will likely show an error.";
+    }
+
+    function fill(values) {
+      for (const [key, value] of Object.entries(values)) {
+        if ($(key)) $(key).value = value;
+      }
+      $("checkoutUrl").dataset.edited = "false";
+      syncCheckoutUrl();
+      renderUniversalUrl();
+    }
+
+    function extractTokenFromCheckoutUrl() {
+      try {
+        const url = new URL($("checkoutUrl").value.trim());
+        const token = url.pathname.split("/").filter(Boolean).pop();
+        if (token) {
+          $("orderToken").value = token;
+          $("checkoutUrl").dataset.edited = "false";
+          syncCheckoutUrl();
+          renderUniversalUrl();
         }
-        return current;
-      }, null);
-      const finalState = winner ? winner.state : "online";
-      const meta = stateMeta[finalState];
-
-      output.stateName.textContent = meta.name;
-      output.stateName.className = "state-name";
-      output.stateReason.textContent = winner
-        ? `${winner.label}：${winner.detail}`
-        : meta.reason;
-      output.statePill.className = `state-pill ${meta.pillClass}`;
-      output.statePill.textContent = `管控强度：${meta.score} / 4`;
-      output.searchable.textContent = meta.searchable ? "是" : "否";
-      output.searchable.className = meta.searchable ? "yes" : "no";
-      output.bookable.textContent = meta.bookable ? "是" : "否";
-      output.bookable.className = meta.bookable ? "yes" : "no";
-      output.sourceCount.textContent = `${candidates.length} 个候选状态`;
-
-      output.matchedList.innerHTML = "";
-      if (candidates.length === 0) {
-        const item = document.createElement("li");
-        item.innerHTML = '<span class="rank">1</span><span class="empty">未命中限制条件，默认正常在线。</span>';
-        output.matchedList.appendChild(item);
-        return;
+      } catch (error) {
+        $("status").textContent = "Could not parse checkout_url. Paste a full URL like https://checkout.revolut.com/payment-link/{token}.";
       }
-
-      candidates
-        .slice()
-        .sort((a, b) => b.score - a.score)
-        .forEach((candidate) => {
-          const item = document.createElement("li");
-          const state = stateMeta[candidate.state];
-          item.innerHTML = `
-            <span class="rank">${candidate.score}</span>
-            <span>
-              <span class="matched">${candidate.label}</span><br>
-              候选状态：<span class="state-pill ${state.pillClass}">${state.name}</span>
-              <br>${candidate.detail}
-            </span>
-          `;
-          output.matchedList.appendChild(item);
-        });
     }
 
-    function setPreset(name) {
-      controls.operationStatus.value = "operating";
-      controls.virtualHotel.checked = false;
-      controls.staffApartment.checked = false;
-      controls.infoMissing.checked = false;
-      controls.otaPenaltyMode.value = "none";
-      controls.pricePenaltyMode.value = "none";
-      controls.manualTarget.value = "none";
-
-      if (name === "virtual") {
-        controls.virtualHotel.checked = true;
-      }
-      if (name === "penalty") {
-        controls.pricePenaltyMode.value = "both";
-      }
-      if (name === "manualConflict") {
-        controls.pricePenaltyMode.value = "temp";
-        controls.manualTarget.value = "online";
-      }
-      if (name === "closed") {
-        controls.operationStatus.value = "permStop";
-      }
-      render();
-    }
-
-    Object.values(controls).forEach((control) => {
-      control.addEventListener("change", render);
+    $("checkoutUrl").addEventListener("input", () => {
+      $("checkoutUrl").dataset.edited = "true";
     });
 
-    document.querySelectorAll(".preset").forEach((button) => {
-      button.addEventListener("click", () => setPreset(button.dataset.preset));
+    ["orderToken", "publicKey", "returnUrl", "successUrl", "failureUrl", "cancelUrl", "locale", "mobileBrowser"].forEach((id) => {
+      $(id).addEventListener("input", () => {
+        syncCheckoutUrl();
+        renderUniversalUrl();
+      });
     });
 
-    render();
+    $("openCheckout").addEventListener("click", () => {
+      window.location.href = $("checkoutUrl").value.trim();
+    });
+
+    $("openUniversal").addEventListener("click", () => {
+      window.location.href = buildUniversalUrl();
+    });
+
+    $("fillDocsSample").addEventListener("click", () => fill(docsSample));
+    $("fillFromCheckout").addEventListener("click", extractTokenFromCheckoutUrl);
+
+    syncCheckoutUrl();
+    renderUniversalUrl();
   </script>
 </body>
 </html>
