@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>传统 Booking vs Agentic Booking 对比图</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f4f7fb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .slide {
+      width: 1440px;
+      min-height: 860px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+      border-radius: 28px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+      padding: 36px 40px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: -120px -160px auto auto;
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.16), transparent 65%);
+      pointer-events: none;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin: 0 0 28px;
+    }
+
+    .title span {
+      color: #1557d6;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 0.86fr 92px 1.34fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border-radius: 24px;
+      border: 1px solid #dbe5f1;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 12px 34px rgba(15, 23, 42, 0.06);
+      padding: 28px;
+      position: relative;
+    }
+
+    .panel.traditional {
+      background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+    }
+
+    .panel.agentic {
+      background: linear-gradient(180deg, #f8fbff 0%, #eff6ff 100%);
+      border-color: #bfdbfe;
+    }
+
+    .panel-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .panel-header p {
+      margin: 8px 0 0;
+      color: #475569;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .agentic .panel-header h2,
+    .agentic .panel-header p {
+      color: #1557d6;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 52px 58px 1fr;
+      gap: 14px;
+      align-items: center;
+      min-height: 70px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+    }
+
+    .num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #94a3b8, #64748b);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px;
+      line-height: 1;
+    }
+
+    .step strong {
+      display: block;
+      font-size: 21px;
+      margin-bottom: 4px;
+    }
+
+    .step span {
+      display: block;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .manual-summary {
+      margin-top: 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(180deg, #f8fafc, #eef2f7);
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 20px 22px;
+    }
+
+    .manual-summary .person {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: #e2e8f0;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      flex: 0 0 auto;
+    }
+
+    .manual-summary-text {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.45;
+      padding-left: 4px;
+    }
+
+    .vs-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vs {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #3b82f6, #1557d6);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.34);
+      border: 8px solid #dbeafe;
+    }
+
+    .user-request {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 16px;
+      margin: 8px 0 20px;
+    }
+
+    .avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: #dbeafe;
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      box-shadow: 0 0 0 9px #eaf2ff;
+      flex: 0 0 auto;
+    }
+
+    .bubble {
+      max-width: 430px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 18px 22px;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.55;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    .arrow-down {
+      width: 0;
+      height: 0;
+      margin: 0 auto 14px;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-top: 22px solid #2563eb;
+      filter: drop-shadow(0 6px 8px rgba(37, 99, 235, 0.22));
+    }
+
+    .agent-box {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1.5px solid #93c5fd;
+      border-radius: 22px;
+      padding: 28px 26px 24px;
+      margin-top: 4px;
+      box-shadow: inset 0 0 36px rgba(59, 130, 246, 0.06);
+    }
+
+    .agent-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 30px;
+      color: #1557d6;
+      font-weight: 900;
+      margin-bottom: 24px;
+    }
+
+    .bot {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: #dbeafe;
+      color: #1557d6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      box-shadow: 0 0 0 7px #eff6ff;
+      flex: 0 0 auto;
+    }
+
+    .agent-flow {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .flow-item {
+      text-align: center;
+      position: relative;
+    }
+
+    .flow-item:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -12px;
+      top: 29px;
+      color: #60a5fa;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .circle-icon {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #ffffff, #eff6ff);
+      border: 1px solid #bfdbfe;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1557d6;
+      font-size: 30px;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12);
+    }
+
+    .flow-item b {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: white;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .flow-item span {
+      display: block;
+      color: #1e3a8a;
+      font-size: 15px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .human-involved .circle-icon {
+      background: linear-gradient(180deg, #fff7ed, #ffedd5);
+      border-color: #fdba74;
+      color: #ea580c;
+    }
+
+    .human-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 7px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #c2410c;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .human-badge i {
+      font-size: 13px;
+    }
+
+    .result-card {
+      width: 520px;
+      margin: 24px auto 0;
+      background: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 18px 28px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+    }
+
+    .check {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: #16a34a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .result-card strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .result-card span {
+      color: #64748b;
+      font-size: 15px;
+    }
+
+    .agent-summary {
+      margin-top: 16px;
+      background: linear-gradient(90deg, #eaf2ff, #ffffff);
+      border: 1px solid #bfdbfe;
+      border-radius: 18px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 25px;
+      color: #1557d6;
+      font-weight: 900;
+    }
+
+    .value-row {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid #dbe5f1;
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .value {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      min-height: 76px;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .value:last-child {
+      border-right: none;
+    }
+
+    .value-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 3px solid #2563eb;
+      color: #1557d6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex: 0 0 auto;
+    }
+
+    .value strong {
+      display: block;
+      font-size: 21px;
+      margin-bottom: 4px;
+    }
+
+    .value span {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 14px;
+      }
+
+      .slide {
+        width: 100%;
+        padding: 24px 16px;
+      }
+
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .vs-wrap {
+        padding: 8px 0;
+      }
+
+      .agent-flow,
+      .value-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .flow-item:not(:last-child)::after {
+        display: none;
+      }
+
+      .result-card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="slide">
+    <h1 class="title">传统 Booking <span>vs</span> Agentic Booking 对比</h1>
+
+    <section class="main">
+      <div class="panel traditional">
+        <div class="panel-header">
+          <h2>传统 Booking</h2>
+          <p>用户自己操作，步骤多，耗时长</p>
+        </div>
+
+        <div class="step-list">
+          <div class="step"><div class="num">1</div><div class="icon"><i class="ri-search-line"></i></div><div><strong>搜索酒店</strong><span>输入目的地、日期等信息</span></div></div>
+          <div class="step"><div class="num">2</div><div class="icon"><i class="ri-filter-3-line"></i></div><div><strong>筛选条件</strong><span>日期 / 价格 / 位置 / 评分 / 设施</span></div></div>
+          <div class="step"><div class="num">3</div><div class="icon"><i class="ri-file-list-3-line"></i></div><div><strong>查看详情</strong><span>酒店介绍 / 房型 / 政策</span></div></div>
+          <div class="step"><div class="num">4</div><div class="icon"><i class="ri-scales-3-line"></i></div><div><strong>比较选择</strong><span>对比多家酒店和房型</span></div></div>
+          <div class="step"><div class="num">5</div><div class="icon"><i class="ri-user-line"></i></div><div><strong>填写信息</strong><span>入住人 / 联系方式</span></div></div>
+          <div class="step"><div class="num">6</div><div class="icon"><i class="ri-clipboard-line"></i></div><div><strong>提交订单</strong><span>确认房型 / 价格 / 政策</span></div></div>
+          <div class="step"><div class="num">7</div><div class="icon"><i class="ri-bank-card-line"></i></div><div><strong>支付</strong><span>选择支付方式完成支付</span></div></div>
+        </div>
+      </div>
+
+      <div class="vs-wrap">
+        <div class="vs">VS</div>
+      </div>
+
+      <div class="panel agentic">
+        <div class="panel-header">
+          <h2>Agentic Booking</h2>
+          <p>AI Agent 代用户执行，智能完成闭环</p>
+        </div>
+
+        <div class="user-request">
+          <div class="avatar"><i class="ri-user-smile-line"></i></div>
+          <div class="bubble">帮我订一间下周五上海静安区附近、预算 800 元以内、带早餐、评分高的酒店。</div>
+        </div>
+
+        <div class="arrow-down"></div>
+
+        <div class="agent-box">
+          <div class="agent-title"><div class="bot"><i class="ri-robot-2-line"></i></div>AI Agent</div>
+          <div class="agent-flow">
+            <div class="flow-item"><div class="circle-icon"><i class="ri-focus-3-line"></i></div><b>1</b><span>理解需求</span></div>
+            <div class="flow-item"><div class="circle-icon"><i class="ri-search-line"></i></div><b>2</b><span>查询商品</span></div>
+            <div class="flow-item"><div class="circle-icon"><i class="ri-bar-chart-2-line"></i></div><b>3</b><span>对比分析</span></div>
+            <div class="flow-item"><div class="circle-icon"><i class="ri-star-smile-line"></i></div><b>4</b><span>推荐选项</span></div>
+            <div class="flow-item human-involved"><div class="circle-icon"><i class="ri-checkbox-circle-line"></i></div><b>5</b><span>用户确认</span><em class="human-badge"><i class="ri-user-line"></i>用户参与</em></div>
+            <div class="flow-item"><div class="circle-icon"><i class="ri-file-add-line"></i></div><b>6</b><span>创建订单</span></div>
+            <div class="flow-item human-involved"><div class="circle-icon"><i class="ri-bank-card-line"></i></div><b>7</b><span>发起支付</span><em class="human-badge"><i class="ri-user-line"></i>用户授权</em></div>
+            <div class="flow-item"><div class="circle-icon"><i class="ri-send-plane-line"></i></div><b>8</b><span>返回结果</span></div>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="check"><i class="ri-check-line"></i></div>
+          <div><strong>预订完成</strong><span>订单信息 / 入住凭证 / 发票等结果返回</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
